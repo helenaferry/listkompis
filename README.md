@@ -49,14 +49,14 @@ npm run dev
 
 ## Skript
 
-| Kommando | Beskrivning |
-|---|---|
-| `npm run dev` | Startar dev-server |
-| `npm run build` | Produktionsbygge |
-| `npm run test` | Kör tester i watch-läge |
-| `npm run test:run` | Kör tester en gång |
-| `npm run typecheck` | TypeScript-kontroll |
-| `npm run lint` | ESLint |
+| Kommando            | Beskrivning             |
+| ------------------- | ----------------------- |
+| `npm run dev`       | Startar dev-server      |
+| `npm run build`     | Produktionsbygge        |
+| `npm run test`      | Kör tester i watch-läge |
+| `npm run test:run`  | Kör tester en gång      |
+| `npm run typecheck` | TypeScript-kontroll     |
+| `npm run lint`      | ESLint                  |
 
 ## Deploya till Vercel
 
@@ -68,12 +68,30 @@ npm run dev
 ## Databasstruktur
 
 ```
+lists
+  id          uuid  (PK)
+  name        text
+  created_at  timestamptz
+
+list_members
+  list_id     uuid → lists
+  user_id     uuid → auth.users
+  is_favorite boolean
+  joined_at   timestamptz
+
 items
   id          uuid  (PK)
+  list_id     uuid → lists
   text        text
   is_checked  boolean
   created_at  timestamptz
   created_by  uuid → auth.users
+
+list_invites
+  id          uuid  (PK)
+  list_id     uuid → lists
+  token       text  (unik inbjudningslänk)
+  created_at  timestamptz
 ```
 
-Row Level Security är aktiverat: alla inloggade kan läsa och bocka av, men bara skaparen kan lägga till.
+Row Level Security är aktiverat: alla som är medlemmar i en lista kan läsa, lägga till och bocka av i den listan.
