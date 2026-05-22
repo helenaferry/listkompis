@@ -28,7 +28,15 @@ export default async function ListsPage() {
     .order("joined_at", { ascending: true });
 
   const lists: ListEntry[] = (memberships ?? []).map((m) => {
-    const l = m.lists as { id: string; name: string; created_at: string };
+    const rawL = m.lists as
+      | { id: string; name: string; created_at: string }
+      | { id: string; name: string; created_at: string }[]
+      | null;
+    const l = (Array.isArray(rawL) ? rawL[0] : rawL) as {
+      id: string;
+      name: string;
+      created_at: string;
+    };
     return {
       id: l.id,
       name: l.name,

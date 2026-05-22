@@ -56,7 +56,9 @@ export default async function InvitePage({
     );
   }
 
-  const listName = (invite.lists as { name: string }).name;
+  const rawLists = invite.lists as { name: string } | { name: string }[] | null;
+  const listName =
+    (Array.isArray(rawLists) ? rawLists[0] : rawLists)?.name ?? "listan";
 
   async function handleJoin() {
     "use server";

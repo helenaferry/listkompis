@@ -37,7 +37,13 @@ export default async function ListPage({
 
   if (!membership) notFound();
 
-  const list = membership.lists as { id: string; name: string };
+  const rawList = membership.lists as
+    | { id: string; name: string }
+    | { id: string; name: string }[]
+    | null;
+  const list = Array.isArray(rawList)
+    ? rawList[0]
+    : (rawList as { id: string; name: string });
 
   const { data: items } = await supabase
     .from("items")
