@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="96" fill="#2563eb"/>
+  <!-- List lines -->
+  <path d="M152 184 L360 184" stroke="white" stroke-width="36" stroke-linecap="round"/>
+  <path d="M152 256 L360 256" stroke="white" stroke-width="36" stroke-linecap="round"/>
+  <path d="M152 328 L264 328" stroke="white" stroke-width="36" stroke-linecap="round"/>
+  <!-- Checkmark bottom right -->
+  <path d="M300 312 L328 340 L376 284" stroke="white" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

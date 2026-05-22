@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { setFavorite, removeFavorite, getOrCreateInvite } from "@/app/actions";
 import ChecklistItem from "./ChecklistItem";
-import AddItemForm from "./AddItemForm";
+import NewItemRow from "./NewItemRow";
 import type { Item } from "@/lib/types";
 
 type HideMode = "strike" | "hide";
@@ -47,7 +47,7 @@ export default function ChecklistView({
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setItems((prev) => [...prev, payload.new as Item]);
+            setItems((prev) => [payload.new as Item, ...prev]);
           } else if (payload.eventType === "UPDATE") {
             setItems((prev) =>
               prev.map((item) =>
@@ -71,6 +71,11 @@ export default function ChecklistView({
   const handleToggle = async (id: string, checked: boolean) => {
     const supabase = createClient();
     await supabase.from("items").update({ is_checked: checked }).eq("id", id);
+  };
+
+  const handleEdit = async (id: string, text: string) => {
+    const supabase = createClient();
+    await supabase.from("items").update({ text }).eq("id", id);
   };
 
   const handleAdd = async (text: string) => {
@@ -114,7 +119,6 @@ export default function ChecklistView({
 
   const visibleItems =
     hideMode === "hide" ? items.filter((i) => !i.is_checked) : items;
-  const checkedCount = items.filter((i) => i.is_checked).length;
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8">
@@ -128,31 +132,24 @@ export default function ChecklistView({
           >
             ←
           </a>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900 truncate">
-                {listName}
-              </h1>
-              <button
-                onClick={handleFavoriteToggle}
-                title={
-                  isFavorite
-                    ? "Ta bort favorit"
-                    : "Markera som favorit – öppnas direkt vid inloggning"
-                }
-                className="text-xl leading-none flex-shrink-0 hover:scale-110 transition-transform"
-                aria-label={
-                  isFavorite ? "Ta bort favorit" : "Markera som favorit"
-                }
-              >
-                {isFavorite ? "⭐" : "☆"}
-              </button>
-            </div>
-            {checkedCount > 0 && (
-              <p className="text-sm text-gray-400 mt-0.5">
-                {checkedCount} av {items.length} avbockat
-              </p>
-            )}
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-2xl font-bold text-gray-900 truncate">
+              {listName}
+            </h1>
+            <button
+              onClick={handleFavoriteToggle}
+              title={
+                isFavorite
+                  ? "Ta bort favorit"
+                  : "Markera som favorit – öppnas direkt vid inloggning"
+              }
+              className="text-xl leading-none flex-shrink-0 hover:scale-110 transition-transform"
+              aria-label={
+                isFavorite ? "Ta bort favorit" : "Markera som favorit"
+              }
+            >
+              {isFavorite ? "⭐" : "☆"}
+            </button>
           </div>
         </div>
         <div className="flex items-center gap-3 text-sm flex-shrink-0">
@@ -166,34 +163,16 @@ export default function ChecklistView({
         </div>
       </div>
 
-      {/* Add item */}
-      <AddItemForm onAdd={handleAdd} />
-
       {/* Controls */}
-      <div className="flex items-center justify-between my-5">
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-600">Avbockade:</span>
-          <button
-            role="switch"
-            aria-checked={hideMode === "strike"}
-            onClick={() =>
-              setHideMode((m) => (m === "strike" ? "hide" : "strike"))
-            }
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-              hideMode === "strike" ? "bg-blue-600" : "bg-gray-300"
-            }`}
-            aria-label="Växla visning av avbockade"
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                hideMode === "strike" ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-          <span className="text-sm text-gray-600">
-            {hideMode === "strike" ? "visas överstrukna" : "döljs"}
-          </span>
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={() =>
+            setHideMode((m) => (m === "strike" ? "hide" : "strike"))
+          }
+          className="text-sm text-gray-400 hover:text-gray-600"
+        >
+          {hideMode === "hide" ? "Visa avbockade" : "Dölj avbockade"}
+        </button>
         <button
           onClick={handleInvite}
           className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -219,19 +198,19 @@ export default function ChecklistView({
 
       {/* List */}
       <ul className="space-y-2">
+        <NewItemRow onAdd={handleAdd} />
         {visibleItems.map((item) => (
           <ChecklistItem
             key={item.id}
             item={item}
             onToggle={handleToggle}
+            onEdit={handleEdit}
             hideMode={hideMode}
           />
         ))}
         {visibleItems.length === 0 && (
-          <li className="text-center text-gray-400 py-12 text-sm">
-            {items.length === 0
-              ? "Listan är tom – lägg till något ovan!"
-              : "Alla saker är avbockade!"}
+          <li className="text-center text-gray-400 py-8 text-sm">
+            Inga saker i listan ännu.
           </li>
         )}
       </ul>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ChecklistItem from "./ChecklistItem";
-import AddItemForm from "./AddItemForm";
+import NewItemRow from "./NewItemRow";
 import type { Item } from "@/lib/types";
 
 const ITEMS_KEY = "listkompis_items";
@@ -26,7 +26,10 @@ function getListName(listId: string): string {
   try {
     const raw = localStorage.getItem(LISTS_KEY);
     const lists = raw ? JSON.parse(raw) : [];
-    return lists.find((l: { id: string; name: string }) => l.id === listId)?.name ?? "Lista";
+    return (
+      lists.find((l: { id: string; name: string }) => l.id === listId)?.name ??
+      "Lista"
+    );
   } catch {
     return "Lista";
   }
@@ -73,13 +76,17 @@ export default function DevChecklistView({ listId }: Props) {
       created_at: new Date().toISOString(),
       created_by: null,
     };
-    updateItems([...items, item]);
+    updateItems([item, ...items]);
   };
 
   const handleToggle = async (id: string, checked: boolean) => {
     updateItems(
       items.map((i) => (i.id === id ? { ...i, is_checked: checked } : i)),
     );
+  };
+
+  const handleEdit = async (id: string, text: string) => {
+    updateItems(items.map((i) => (i.id === id ? { ...i, text } : i)));
   };
 
   const visibleItems =
@@ -106,47 +113,29 @@ export default function DevChecklistView({ listId }: Props) {
             <h1 className="text-2xl font-bold text-gray-900 truncate">
               {listName}
             </h1>
-            {checkedCount > 0 && (
-              <p className="text-sm text-gray-400 mt-0.5">
-                {checkedCount} av {items.length} avbockat
-              </p>
-            )}
           </div>
         </div>
       </div>
 
-      <AddItemForm onAdd={handleAdd} />
-
-      <div className="flex items-center gap-3 my-5">
-        <span className="text-sm text-gray-600">Avbockade:</span>
+      <div className="flex items-center justify-between my-4">
         <button
-          role="switch"
-          aria-checked={hideMode === "strike"}
           onClick={() =>
             setHideMode((m) => (m === "strike" ? "hide" : "strike"))
           }
-          className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-            hideMode === "strike" ? "bg-blue-600" : "bg-gray-300"
-          }`}
-          aria-label="Växla visning av avbockade"
+          className="text-sm text-gray-400 hover:text-gray-600"
         >
-          <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-              hideMode === "strike" ? "translate-x-6" : "translate-x-1"
-            }`}
-          />
+          {hideMode === "hide" ? "Visa avbockade" : "Dölj avbockade"}
         </button>
-        <span className="text-sm text-gray-600">
-          {hideMode === "strike" ? "visas överstrukna" : "döljs"}
-        </span>
       </div>
 
       <ul className="space-y-2">
+        <NewItemRow onAdd={handleAdd} />
         {visibleItems.map((item) => (
           <ChecklistItem
             key={item.id}
             item={item}
             onToggle={handleToggle}
+            onEdit={handleEdit}
             hideMode={hideMode}
           />
         ))}

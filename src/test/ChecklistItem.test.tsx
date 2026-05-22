@@ -14,14 +14,24 @@ const mockItem = {
 describe("ChecklistItem", () => {
   it("renders the item text", () => {
     render(
-      <ChecklistItem item={mockItem} onToggle={vi.fn()} hideMode="strike" />,
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
     );
     expect(screen.getByText("Köp mjölk")).toBeInTheDocument();
   });
 
   it("checkbox is unchecked for an unchecked item", () => {
     render(
-      <ChecklistItem item={mockItem} onToggle={vi.fn()} hideMode="strike" />,
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
     );
     expect(screen.getByRole("checkbox")).not.toBeChecked();
   });
@@ -29,23 +39,85 @@ describe("ChecklistItem", () => {
   it("calls onToggle with correct args when checkbox is clicked", () => {
     const onToggle = vi.fn();
     render(
-      <ChecklistItem item={mockItem} onToggle={onToggle} hideMode="strike" />,
+      <ChecklistItem
+        item={mockItem}
+        onToggle={onToggle}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
     );
     fireEvent.click(screen.getByRole("checkbox"));
     expect(onToggle).toHaveBeenCalledWith("1", true);
   });
 
+  it("activates edit mode when text is clicked", () => {
+    render(
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
+    );
+    fireEvent.click(screen.getByText("Köp mjölk"));
+    expect(
+      screen.getByRole("textbox", { name: "Redigera" }),
+    ).toBeInTheDocument();
+  });
+
+  it("calls onEdit with new text on blur", () => {
+    const onEdit = vi.fn();
+    render(
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={onEdit}
+        hideMode="strike"
+      />,
+    );
+    fireEvent.click(screen.getByText("Köp mjölk"));
+    const input = screen.getByRole("textbox", { name: "Redigera" });
+    fireEvent.change(input, { target: { value: "Köp smör" } });
+    fireEvent.blur(input);
+    expect(onEdit).toHaveBeenCalledWith("1", "Köp smör");
+  });
+
+  it("does not call onEdit when text is unchanged", () => {
+    const onEdit = vi.fn();
+    render(
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={onEdit}
+        hideMode="strike"
+      />,
+    );
+    fireEvent.click(screen.getByText("Köp mjölk"));
+    fireEvent.blur(screen.getByRole("textbox", { name: "Redigera" }));
+    expect(onEdit).not.toHaveBeenCalled();
+  });
+
   it("shows strikethrough text when item is checked", () => {
     const checkedItem = { ...mockItem, is_checked: true };
     render(
-      <ChecklistItem item={checkedItem} onToggle={vi.fn()} hideMode="strike" />,
+      <ChecklistItem
+        item={checkedItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
     );
     expect(screen.getByText("Köp mjölk")).toHaveClass("line-through");
   });
 
   it("does not apply strikethrough when item is not checked", () => {
     render(
-      <ChecklistItem item={mockItem} onToggle={vi.fn()} hideMode="strike" />,
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
     );
     expect(screen.getByText("Köp mjölk")).not.toHaveClass("line-through");
   });

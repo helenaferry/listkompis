@@ -43,7 +43,7 @@ export default async function ListPage({
     .from("items")
     .select("*")
     .eq("list_id", id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false });
 
   return (
     <main className="min-h-screen bg-gray-50">

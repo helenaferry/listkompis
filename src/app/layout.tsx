@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Listkompis",
   description: "Din delade checklista",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Listkompis",
+  },
 };
 
 export default function RootLayout({
