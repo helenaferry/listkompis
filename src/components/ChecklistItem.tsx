@@ -1,10 +1,5 @@
-export type Item = {
-  id: string;
-  text: string;
-  is_checked: boolean;
-  created_at: string;
-  created_by: string | null;
-};
+export type { Item } from "@/lib/types";
+import type { Item } from "@/lib/types";
 
 interface Props {
   item: Item;

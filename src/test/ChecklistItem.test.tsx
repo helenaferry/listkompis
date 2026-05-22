@@ -4,6 +4,7 @@ import ChecklistItem from "@/components/ChecklistItem";
 
 const mockItem = {
   id: "1",
+  list_id: "list-1",
   text: "Köp mjölk",
   is_checked: false,
   created_at: "2024-01-01T00:00:00Z",

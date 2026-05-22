@@ -1,41 +1,28 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import ChecklistView from "@/components/ChecklistView";
-import DevChecklistView from "@/components/DevChecklistView";
 
 const isDevMode = !process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 export default async function Home() {
   if (isDevMode) {
-    return (
-      <main className="min-h-screen bg-gray-50">
-        <DevChecklistView />
-      </main>
-    );
+    redirect("/listor");
   }
 
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
-  if (!user) {
-    redirect("/login");
-  }
+  // Redirect to favorite list if one is set
+  const { data: favorite } = await supabase
+    .from("list_members")
+    .select("list_id")
+    .eq("user_id", user.id)
+    .eq("is_favorite", true)
+    .maybeSingle();
 
-  const { data: items } = await supabase
-    .from("items")
-    .select("*")
-    .order("created_at", { ascending: true });
+  if (favorite) redirect(`/lista/${favorite.list_id}`);
 
-  return (
-    <main className="min-h-screen bg-gray-50">
-      <ChecklistView
-        initialItems={items ?? []}
-        userId={user.id}
-        userEmail={user.email ?? ""}
-      />
-    </main>
-  );
+  redirect("/listor");
 }

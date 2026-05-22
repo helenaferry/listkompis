@@ -1,50 +1,73 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ChecklistItem, { type Item } from "./ChecklistItem";
+import ChecklistItem from "./ChecklistItem";
 import AddItemForm from "./AddItemForm";
+import type { Item } from "@/lib/types";
 
-const STORAGE_KEY = "listkompis_items";
+const ITEMS_KEY = "listkompis_items";
+const LISTS_KEY = "listkompis_lists";
 type HideMode = "strike" | "hide";
 
-function loadItems(): Item[] {
+function loadAllItems(): Item[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(ITEMS_KEY);
     return raw ? (JSON.parse(raw) as Item[]) : [];
   } catch {
     return [];
   }
 }
 
-function saveItems(items: Item[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+function saveAllItems(items: Item[]) {
+  localStorage.setItem(ITEMS_KEY, JSON.stringify(items));
 }
 
-export default function DevChecklistView() {
-  const [items, setItems] = useState<Item[]>([]);
+function getListName(listId: string): string {
+  try {
+    const raw = localStorage.getItem(LISTS_KEY);
+    const lists = raw ? JSON.parse(raw) : [];
+    return lists.find((l: { id: string; name: string }) => l.id === listId)?.name ?? "Lista";
+  } catch {
+    return "Lista";
+  }
+}
+
+interface Props {
+  listId: string;
+}
+
+export default function DevChecklistView({ listId }: Props) {
+  const [allItems, setAllItems] = useState<Item[]>([]);
+  const [listName, setListName] = useState("Lista");
   const [hideMode, setHideMode] = useState<HideMode>("strike");
 
   useEffect(() => {
-    setItems(loadItems());
-  }, []);
+    setAllItems(loadAllItems());
+    setListName(getListName(listId));
+  }, [listId]);
 
-  // Cross-tab sync via native storage event
+  // Cross-tab sync
   useEffect(() => {
     const handler = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setItems(loadItems());
+      if (e.key === ITEMS_KEY) setAllItems(loadAllItems());
     };
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
   }, []);
 
-  const updateItems = (next: Item[]) => {
-    setItems(next);
-    saveItems(next);
+  const items = allItems.filter((i) => i.list_id === listId);
+
+  const updateItems = (nextForList: Item[]) => {
+    const rest = allItems.filter((i) => i.list_id !== listId);
+    const next = [...rest, ...nextForList];
+    setAllItems(next);
+    saveAllItems(next);
   };
 
   const handleAdd = async (text: string) => {
     const item: Item = {
       id: crypto.randomUUID(),
+      list_id: listId,
       text,
       is_checked: false,
       created_at: new Date().toISOString(),
@@ -71,13 +94,24 @@ export default function DevChecklistView() {
       </div>
 
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Listkompis</h1>
-          {checkedCount > 0 && (
-            <p className="text-sm text-gray-400 mt-0.5">
-              {checkedCount} av {items.length} avbockat
-            </p>
-          )}
+        <div className="flex items-center gap-3 min-w-0">
+          <a
+            href="/listor"
+            className="text-gray-400 hover:text-gray-600 flex-shrink-0 text-lg"
+            aria-label="Mina listor"
+          >
+            ←
+          </a>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-gray-900 truncate">
+              {listName}
+            </h1>
+            {checkedCount > 0 && (
+              <p className="text-sm text-gray-400 mt-0.5">
+                {checkedCount} av {items.length} avbockat
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

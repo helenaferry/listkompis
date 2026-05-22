@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const isDevMode = !process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (isDevMode) {
     return NextResponse.next();
   }
@@ -44,6 +44,9 @@ export async function middleware(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    if (pathname !== "/") {
+      url.searchParams.set("next", pathname);
+    }
     return NextResponse.redirect(url);
   }
 
