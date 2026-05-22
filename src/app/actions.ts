@@ -11,21 +11,15 @@ export async function createList(name: string): Promise<string> {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data: list, error } = await supabase
-    .from("lists")
-    .insert({ name, created_by: user.id })
-    .select("id")
-    .single();
+  const { data: listId, error } = await supabase.rpc("create_list", {
+    p_name: name,
+  });
 
-  if (error || !list)
+  if (error || !listId)
     throw new Error(error?.message ?? "Could not create list");
 
-  await supabase
-    .from("list_members")
-    .insert({ list_id: list.id, user_id: user.id });
-
   revalidatePath("/listor");
-  return list.id;
+  return listId as string;
 }
 
 export async function setFavorite(listId: string): Promise<void> {
