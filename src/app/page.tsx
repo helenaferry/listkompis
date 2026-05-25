@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-const isDevMode = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+const isDevMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
 export default async function Home() {
   if (isDevMode) {

@@ -1,7 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const isDevMode = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+const isDevMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
 export async function proxy(request: NextRequest) {
   if (isDevMode) {

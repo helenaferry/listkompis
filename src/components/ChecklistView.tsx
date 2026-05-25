@@ -27,7 +27,12 @@ export default function ChecklistView({
   isFavorite: initialIsFavorite,
 }: Props) {
   const [items, setItems] = useState<Item[]>(initialItems);
-  const [hideMode, setHideMode] = useState<HideMode>("strike");
+  const [hideMode, setHideMode] = useState<HideMode>(() => {
+    if (typeof window === "undefined") return "strike";
+    return (
+      (localStorage.getItem("listkompis_hideMode") as HideMode) ?? "strike"
+    );
+  });
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [copyLabel, setCopyLabel] = useState("Kopiera");
@@ -197,7 +202,11 @@ export default function ChecklistView({
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() =>
-            setHideMode((m) => (m === "strike" ? "hide" : "strike"))
+            setHideMode((m) => {
+              const next = m === "strike" ? "hide" : "strike";
+              localStorage.setItem("listkompis_hideMode", next);
+              return next;
+            })
           }
           className="text-sm text-gray-400 hover:text-gray-600"
         >

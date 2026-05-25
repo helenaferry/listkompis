@@ -24,69 +24,30 @@ export async function createList(name: string): Promise<string> {
 
 export async function setFavorite(listId: string): Promise<void> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  // Clear all favorites for this user, then set the new one
-  await supabase
-    .from("list_members")
-    .update({ is_favorite: false })
-    .eq("user_id", user.id);
-
-  await supabase
-    .from("list_members")
-    .update({ is_favorite: true })
-    .eq("user_id", user.id)
-    .eq("list_id", listId);
-
+  const { error } = await supabase.rpc("set_favorite", { p_list_id: listId });
+  if (error) throw new Error(error.message);
   revalidatePath("/listor");
 }
 
 export async function removeFavorite(listId: string): Promise<void> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  await supabase
-    .from("list_members")
-    .update({ is_favorite: false })
-    .eq("user_id", user.id)
-    .eq("list_id", listId);
-
+  const { error } = await supabase.rpc("remove_favorite", {
+    p_list_id: listId,
+  });
+  if (error) throw new Error(error.message);
   revalidatePath("/listor");
 }
 
 export async function getOrCreateInvite(listId: string): Promise<string> {
   const supabase = await createClient();
 
-  // Reuse existing invite for this list if one exists
-  const { data: existing } = await supabase
-    .from("list_invites")
-    .select("token")
-    .eq("list_id", listId)
-    .limit(1)
-    .maybeSingle();
+  const { data: token, error } = await supabase.rpc("get_or_create_invite", {
+    p_list_id: listId,
+  });
 
-  if (existing) return existing.token;
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const { data: invite, error } = await supabase
-    .from("list_invites")
-    .insert({ list_id: listId, created_by: user.id })
-    .select("token")
-    .single();
-
-  if (error || !invite)
+  if (error || !token)
     throw new Error(error?.message ?? "Could not create invite");
-  return invite.token;
+  return token as string;
 }
 
 export async function joinListWithToken(token: string): Promise<void> {

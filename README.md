@@ -32,12 +32,18 @@ npm install
 cp .env.local.example .env.local
 ```
 
-Fyll i dina Supabase-värden i `.env.local`:
+Appen har två lägen:
+
+**Dev-läge (localStorage)** – inget Supabase-konto behövs. Standardläget när du klonar projektet. Aktiveras av `NEXT_PUBLIC_DEV_MODE=true` i `.env.local`.
+
+**Produktionsläge (Supabase)** – kräver ett Supabase-projekt. Ta bort `NEXT_PUBLIC_DEV_MODE` och fyll i dina värden:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ```
+
+> **Obs:** Supabase har nyligen bytt nyckelformat. Använd den **legacy anon-nyckeln** (börjar med `eyJ`) som finns under **Settings → API → Legacy API keys**.
 
 ### 4. Starta dev-servern
 

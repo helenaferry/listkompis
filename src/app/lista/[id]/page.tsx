@@ -4,7 +4,9 @@ import ChecklistView from "@/components/ChecklistView";
 import DevChecklistView from "@/components/DevChecklistView";
 import type { Item } from "@/lib/types";
 
-const isDevMode = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+const isDevMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
 export default async function ListPage({
   params,

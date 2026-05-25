@@ -4,7 +4,9 @@ import ListsDashboard from "@/components/ListsDashboard";
 import DevListsDashboard from "@/components/DevListsDashboard";
 import type { ListEntry } from "@/lib/types";
 
-const isDevMode = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+const isDevMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
 export default async function ListsPage() {
   if (isDevMode) {
