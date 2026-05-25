@@ -29,10 +29,17 @@ function LoginForm() {
     setLoading(true);
 
     const supabase = createClient();
+    const next = searchParams.get("next") ?? "/";
     const { error } =
       mode === "login"
         ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+        : await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+            },
+          });
 
     if (error) {
       setError(error.message);
