@@ -47,7 +47,11 @@ export default function ChecklistView({
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setItems((prev) => [payload.new as Item, ...prev]);
+            setItems((prev) =>
+              prev.some((i) => i.id === (payload.new as Item).id)
+                ? prev
+                : [payload.new as Item, ...prev],
+            );
           } else if (payload.eventType === "UPDATE") {
             setItems((prev) =>
               prev.map((item) =>
@@ -69,6 +73,11 @@ export default function ChecklistView({
   }, [listId]);
 
   const handleToggle = async (id: string, checked: boolean) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, is_checked: checked } : item,
+      ),
+    );
     const supabase = createClient();
     await supabase.from("items").update({ is_checked: checked }).eq("id", id);
   };
@@ -79,10 +88,31 @@ export default function ChecklistView({
   };
 
   const handleAdd = async (text: string) => {
+    const tempId = crypto.randomUUID();
+    const optimistic: Item = {
+      id: tempId,
+      list_id: listId,
+      text,
+      is_checked: false,
+      created_at: new Date().toISOString(),
+      created_by: userId,
+    };
+    setItems((prev) => [optimistic, ...prev]);
+
     const supabase = createClient();
-    await supabase
+    const { data: newItem, error } = await supabase
       .from("items")
-      .insert({ text, list_id: listId, created_by: userId, is_checked: false });
+      .insert({ text, list_id: listId, created_by: userId, is_checked: false })
+      .select()
+      .single();
+
+    if (error) {
+      setItems((prev) => prev.filter((i) => i.id !== tempId));
+    } else if (newItem) {
+      setItems((prev) =>
+        prev.map((i) => (i.id === tempId ? (newItem as Item) : i)),
+      );
+    }
   };
 
   const handleFavoriteToggle = async () => {
