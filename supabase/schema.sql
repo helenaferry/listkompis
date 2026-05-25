@@ -32,7 +32,7 @@ create table if not exists public.items (
 create table if not exists public.list_invites (
   id         uuid        primary key default gen_random_uuid(),
   list_id    uuid        not null references public.lists(id) on delete cascade,
-  token      text        not null unique default encode(gen_random_bytes(24), 'base64url'),
+  token      text        not null unique default rtrim(replace(replace(encode(gen_random_bytes(24), 'base64'), '+', '-'), '/', '_'), '='),
   created_by uuid        references auth.users(id) on delete set null,
   created_at timestamptz not null default now()
 );
