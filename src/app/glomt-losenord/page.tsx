@@ -2,13 +2,29 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
+  return (
+    <Suspense>
+      <ForgotPasswordForm />
+    </Suspense>
+  );
+}
+
+function ForgotPasswordForm() {
+  const searchParams = useSearchParams();
+  const isExpired = searchParams.get("error") === "expired";
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    isExpired
+      ? "Länken har gått ut eller redan använts. Begär en ny nedan."
+      : null,
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +52,9 @@ export default function ForgotPasswordPage() {
           <p className="text-sm text-gray-600">
             Vi har skickat ett mail till <strong>{email}</strong> med en länk
             för att återställa ditt lösenord.
+          </p>
+          <p className="mt-3 text-xs text-gray-400">
+            Öppna länken i samma webbläsare du använde för att begära den.
           </p>
           <Link
             href="/login"
