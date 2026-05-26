@@ -4,13 +4,23 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 export default function ForgotPasswordPage() {
   return (
     <Suspense>
       <ForgotPasswordForm />
     </Suspense>
+  );
+}
+
+// Use implicit flow (not PKCE) so the reset link works regardless of
+// email delivery delays and which browser the user opens the link in.
+function resetClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { flowType: "implicit" } },
   );
 }
 
@@ -30,9 +40,8 @@ function ForgotPasswordForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/glomt-losenord/nytt`,
+    const { error } = await resetClient().auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/glomt-losenord/nytt`,
     });
     if (error) {
       setError(error.message);
@@ -54,7 +63,7 @@ function ForgotPasswordForm() {
             för att återställa ditt lösenord.
           </p>
           <p className="mt-3 text-xs text-gray-400">
-            Öppna länken i samma webbläsare du använde för att begära den.
+            Länken är giltig i 24 timmar och fungerar i alla webbläsare.
           </p>
           <Link
             href="/login"

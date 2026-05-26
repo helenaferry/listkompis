@@ -1,15 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function NewPasswordPage() {
+  const [sessionReady, setSessionReady] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    // Implicit flow: Supabase puts access_token in the URL hash
+    const hash = window.location.hash.slice(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token") ?? "";
+    const type = params.get("type");
+
+    if (accessToken && type === "recovery") {
+      createClient()
+        .auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(({ error }) => {
+          if (error) setError("Ogiltig eller utgången länk.");
+          else setSessionReady(true);
+        });
+    } else {
+      // Fallback: check for an existing session (e.g. from PKCE callback)
+      createClient()
+        .auth.getSession()
+        .then(({ data }) => {
+          if (data.session) setSessionReady(true);
+          else setError("Ogiltig eller utgången länk.");
+        });
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,12 +61,25 @@ export default function NewPasswordPage() {
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
-          Välj nytt lösenord
-        </h1>
-        <p className="text-sm text-gray-500 mb-6">
-          Ange ett nytt lösenord för ditt Listkompis-konto.
-        </p>
+        {!sessionReady && !error ? (
+          <p className="text-sm text-gray-500 text-center">Verifierar länk…</p>
+        ) : error && !sessionReady ? (
+          <>
+            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 mb-4" role="alert">
+              {error}
+            </p>
+            <Link href="/glomt-losenord" className="text-sm text-blue-600 hover:text-blue-700">
+              Begär en ny återställningslänk
+            </Link>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              Välj nytt lösenord
+            </h1>
+            <p className="text-sm text-gray-500 mb-6">
+              Ange ett nytt lösenord för ditt Listkompis-konto.
+            </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -96,6 +137,8 @@ export default function NewPasswordPage() {
             {loading ? "Sparar…" : "Spara nytt lösenord"}
           </button>
         </form>
+          </>
+        )}
       </div>
     </main>
   );
