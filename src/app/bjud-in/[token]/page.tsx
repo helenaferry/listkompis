@@ -28,14 +28,12 @@ export default async function InvitePage({
     redirect(`/login?next=/bjud-in/${token}`);
   }
 
-  // Look up invite + list name
-  const { data: invite } = await supabase
-    .from("list_invites")
-    .select("list_id, lists(name)")
-    .eq("token", token)
+  // Look up invite details (list name + inviter email)
+  const { data: details } = await supabase
+    .rpc("get_invite_details", { p_token: token })
     .maybeSingle();
 
-  if (!invite) {
+  if (!details) {
     return (
       <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
@@ -56,9 +54,12 @@ export default async function InvitePage({
     );
   }
 
-  const rawLists = invite.lists as { name: string } | { name: string }[] | null;
-  const listName =
-    (Array.isArray(rawLists) ? rawLists[0] : rawLists)?.name ?? "listan";
+  const listName = (
+    details as { list_name: string; inviter_email: string | null }
+  ).list_name;
+  const inviterEmail = (
+    details as { list_name: string; inviter_email: string | null }
+  ).inviter_email;
 
   async function handleJoin() {
     "use server";
@@ -72,7 +73,12 @@ export default async function InvitePage({
           Du är inbjuden!
         </h1>
         <p className="text-gray-500 mb-6">
-          Gå med i listan <strong>{listName}</strong>
+          {inviterEmail && (
+            <span className="block text-sm mb-1">
+              {inviterEmail} bjuder in dig till
+            </span>
+          )}
+          listan <strong>{listName}</strong>
         </p>
         <form action={handleJoin}>
           <button

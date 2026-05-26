@@ -54,7 +54,7 @@ create policy "Members can view their lists"
 
 create policy "Authenticated users can create lists"
   on public.lists for insert to authenticated
-  with check (auth.uid() = created_by);
+  with check (true);
 
 -- list_members: see your own memberships; join via function only
 create policy "Users can view their own memberships"
@@ -64,6 +64,10 @@ create policy "Users can view their own memberships"
 create policy "Users can update their own membership (favorite)"
   on public.list_members for update to authenticated
   using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+create policy "Users can join lists"
+  on public.list_members for insert to authenticated
   with check (user_id = auth.uid());
 
 -- items: members of the list can read/write
@@ -91,13 +95,10 @@ create policy "Members can toggle items"
     where list_id = items.list_id and user_id = auth.uid()
   ));
 
--- list_invites: members can view and create invites for their lists
-create policy "Members can view invites"
+-- list_invites: any authenticated user can view (needed to join via link)
+create policy "Authenticated users can view invites"
   on public.list_invites for select to authenticated
-  using (exists (
-    select 1 from public.list_members
-    where list_id = list_invites.list_id and user_id = auth.uid()
-  ));
+  using (true);
 
 create policy "Members can create invites"
   on public.list_invites for insert to authenticated
@@ -109,7 +110,107 @@ create policy "Members can create invites"
     )
   );
 
--- ─── Join-via-invite function ─────────────────────────────────────────────────
+-- ─── RPC functions ───────────────────────────────────────────────────────────
+
+create or replace function public.create_list(p_name text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  v_list_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then
+    raise exception 'Not authenticated';
+  end if;
+
+  insert into public.lists (name, created_by)
+  values (p_name, v_user_id)
+  returning id into v_list_id;
+
+  insert into public.list_members (list_id, user_id)
+  values (v_list_id, v_user_id);
+
+  return v_list_id;
+end;
+$$;
+
+create or replace function public.set_favorite(p_list_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then
+    raise exception 'Not authenticated';
+  end if;
+
+  update public.list_members set is_favorite = false where user_id = v_user_id;
+  update public.list_members set is_favorite = true where user_id = v_user_id and list_id = p_list_id;
+end;
+$$;
+
+create or replace function public.remove_favorite(p_list_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then
+    raise exception 'Not authenticated';
+  end if;
+
+  update public.list_members set is_favorite = false where user_id = v_user_id and list_id = p_list_id;
+end;
+$$;
+
+create or replace function public.get_or_create_invite(p_list_id uuid)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  v_token   text;
+begin
+  select token into v_token from public.list_invites where list_id = p_list_id limit 1;
+  if v_token is not null then return v_token; end if;
+
+  v_user_id := auth.uid();
+  if v_user_id is null then raise exception 'Not authenticated'; end if;
+
+  insert into public.list_invites (list_id, created_by) values (p_list_id, v_user_id) returning token into v_token;
+  return v_token;
+end;
+$$;
+
+create or replace function public.get_invite_details(p_token text)
+returns table(list_name text, inviter_email text)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  select l.name::text, u.email::text
+  from public.list_invites li
+  join public.lists l on l.id = li.list_id
+  left join auth.users u on u.id = li.created_by
+  where li.token = p_token;
+end;
+$$;
 
 create or replace function public.join_list_with_token(p_token text)
 returns uuid

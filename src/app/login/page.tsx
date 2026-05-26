@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -130,6 +131,15 @@ function LoginForm() {
             ? "Inget konto? Skapa ett"
             : "Har redan konto? Logga in"}
         </button>
+
+        {mode === "login" && (
+          <Link
+            href="/glomt-losenord"
+            className="mt-2 text-sm text-gray-500 hover:text-gray-700 block text-center"
+          >
+            Glömt lösenordet?
+          </Link>
+        )}
       </div>
     </main>
   );
