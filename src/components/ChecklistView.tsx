@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import {
-  getOrCreateInvite,
-  renameList,
-  getListMembers,
-} from "@/app/actions";
+import { getOrCreateInvite, renameList, getListMembers } from "@/app/actions";
 import ChecklistItem from "./ChecklistItem";
 import NewItemRow from "./NewItemRow";
 import type { Item } from "@/lib/types";
