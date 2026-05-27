@@ -62,6 +62,15 @@ export default function ChecklistItem({ item, onToggle, onEdit }: Props) {
       ) : (
         <span
           onClick={startEdit}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              startEdit();
+            }
+          }}
+          aria-label={`Redigera: ${item.text}`}
           className={`flex-1 text-gray-800 break-words cursor-text ${
             item.is_checked ? "line-through text-gray-400" : ""
           }`}

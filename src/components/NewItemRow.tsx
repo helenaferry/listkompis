@@ -36,7 +36,6 @@ export default function NewItemRow({ onAdd }: Props) {
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        onBlur={submit}
         onKeyDown={handleKeyDown}
         placeholder="Lägg till…"
         maxLength={500}

@@ -229,6 +229,7 @@ export default function ChecklistView({
         <div className="flex items-center gap-3 text-sm flex-shrink-0">
           <span
             title={`Realtid: ${rtStatus}`}
+            aria-hidden="true"
             className={`w-2 h-2 rounded-full flex-shrink-0 ${rtStatus === "SUBSCRIBED" ? "bg-green-400" : rtStatus.includes("ERROR") || rtStatus.includes("CLOSED") ? "bg-red-400" : "bg-yellow-400"}`}
           />
           <span className="text-gray-400 text-xs truncate max-w-[160px]">
@@ -258,6 +259,11 @@ export default function ChecklistView({
             <h1
               className="text-2xl font-bold text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors"
               onClick={() => setEditingName(currentName)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") setEditingName(currentName);
+              }}
+              tabIndex={0}
+              role="button"
               title="Klicka för att byta namn"
             >
               {currentName}
@@ -312,7 +318,7 @@ export default function ChecklistView({
           {items.some((i) => i.is_checked) && (
             <div className="px-4 py-3">
               {clearConfirm ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3" role="alert">
                   <span className="text-sm text-gray-600">Är du säker?</span>
                   <button
                     onClick={() => {

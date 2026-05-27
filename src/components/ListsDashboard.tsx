@@ -238,7 +238,8 @@ export default function ListsDashboard({
                     setConfirmingId(null);
                   }
                 }}
-                aria-label="Listalternativ"
+                aria-label={`Alternativ för ${list.name}`}
+                aria-expanded={listMenuId === list.id}
                 className="flex-shrink-0 p-1 text-gray-300 hover:text-gray-500 transition-colors"
               >
                 <svg
@@ -255,7 +256,7 @@ export default function ListsDashboard({
               </button>
             </div>
             {listMenuId === list.id && editingId !== list.id && (
-              <div className="mt-2 flex items-center gap-4 pl-9">
+              <div className="mt-2 flex items-center gap-4 pl-9" role="group" aria-label={`Alternativ för ${list.name}`}>
                 <button
                   onClick={() => {
                     setEditingId(list.id);
@@ -267,7 +268,7 @@ export default function ListsDashboard({
                   Byt namn
                 </button>
                 {confirmingId === list.id ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2" role="alert">
                     <span className="text-sm text-gray-500">Är du säker?</span>
                     <button
                       onClick={() =>
