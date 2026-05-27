@@ -47,47 +47,61 @@ export default function ChecklistView({
 
   useEffect(() => {
     const supabase = createClient();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    const channel = supabase
-      .channel(`items-${listId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "items",
-        },
-        (payload) => {
-          // Filter client-side – more reliable than server-side filter
-          const row = (payload.new ?? payload.old) as Item | undefined;
-          if (row && row.list_id !== listId) return;
+    const setup = async () => {
+      // Ensure the authenticated JWT is set on the Realtime client before
+      // subscribing, so RLS policies can resolve auth.uid() correctly.
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        await supabase.realtime.setAuth(session.access_token);
+      }
 
-          if (payload.eventType === "INSERT") {
-            setItems((prev) =>
-              prev.some((i) => i.id === (payload.new as Item).id)
-                ? prev
-                : [payload.new as Item, ...prev],
-            );
-          } else if (payload.eventType === "UPDATE") {
-            setItems((prev) =>
-              prev.map((item) =>
-                item.id === payload.new.id ? (payload.new as Item) : item,
-              ),
-            );
-          } else if (payload.eventType === "DELETE") {
-            setItems((prev) =>
-              prev.filter((item) => item.id !== (payload.old as Item).id),
-            );
-          }
-        },
-      )
-      .subscribe((status, err) => {
-        setRtStatus(status);
-        if (err) console.error("[Realtime] channel error:", err);
-      });
+      channel = supabase
+        .channel(`items-${listId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "items",
+          },
+          (payload) => {
+            // Filter client-side – more reliable than server-side filter
+            const row = (payload.new ?? payload.old) as Item | undefined;
+            if (row && row.list_id !== listId) return;
+
+            if (payload.eventType === "INSERT") {
+              setItems((prev) =>
+                prev.some((i) => i.id === (payload.new as Item).id)
+                  ? prev
+                  : [payload.new as Item, ...prev],
+              );
+            } else if (payload.eventType === "UPDATE") {
+              setItems((prev) =>
+                prev.map((item) =>
+                  item.id === payload.new.id ? (payload.new as Item) : item,
+                ),
+              );
+            } else if (payload.eventType === "DELETE") {
+              setItems((prev) =>
+                prev.filter((item) => item.id !== (payload.old as Item).id),
+              );
+            }
+          },
+        )
+        .subscribe((status, err) => {
+          setRtStatus(status);
+          if (err) console.error("[Realtime] channel error:", err);
+        });
+    };
+
+    setup();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [listId]);
 
