@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useDarkMode } from "@/lib/useDarkMode";
 import {
   getOrCreateInvite,
   renameList,
@@ -47,6 +48,7 @@ export default function ChecklistView({
   const [members, setMembers] = useState<ListMember[] | null>(null);
   const [membersError, setMembersError] = useState(false);
   const [clearConfirm, setClearConfirm] = useState(false);
+  const { isDark, toggle: toggleDark } = useDarkMode();
 
   useEffect(() => {
     const saved = localStorage.getItem(
@@ -221,7 +223,7 @@ export default function ChecklistView({
       <div className="flex items-center justify-between mb-3">
         <a
           href="/listor"
-          className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 pr-4"
+          className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 pr-4 dark:text-blue-400"
           aria-label="Mina listor"
         >
           Listkompis
@@ -232,7 +234,7 @@ export default function ChecklistView({
             aria-hidden="true"
             className={`w-2 h-2 rounded-full flex-shrink-0 ${rtStatus === "SUBSCRIBED" ? "bg-green-400" : rtStatus.includes("ERROR") || rtStatus.includes("CLOSED") ? "bg-red-400" : "bg-yellow-400"}`}
           />
-          <span className="text-gray-400 text-xs truncate max-w-[160px]">
+          <span className="text-gray-400 text-xs truncate max-w-[160px] dark:text-zinc-500">
             {userEmail}
           </span>
         </div>
@@ -253,11 +255,11 @@ export default function ChecklistView({
                 }
               }}
               maxLength={100}
-              className="text-2xl font-bold text-gray-900 bg-transparent border-b-2 border-blue-500 outline-none min-w-0 w-full"
+              className="text-2xl font-bold text-gray-900 bg-transparent border-b-2 border-blue-500 outline-none min-w-0 w-full dark:text-[#f0ead6]"
             />
           ) : (
             <h1
-              className="text-2xl font-bold text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors"
+              className="text-2xl font-bold text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors dark:text-[#f0ead6] dark:hover:text-blue-400"
               onClick={() => setEditingName(currentName)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") setEditingName(currentName);
@@ -274,7 +276,7 @@ export default function ChecklistView({
           onClick={handleMenuToggle}
           aria-label={menuOpen ? "Stäng meny" : "Öppna meny"}
           aria-expanded={menuOpen}
-          className="flex-shrink-0 p-2 -mr-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+          className="flex-shrink-0 p-2 -mr-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-700"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -292,13 +294,21 @@ export default function ChecklistView({
 
       {/* Expandable menu */}
       {menuOpen && (
-        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 divide-y divide-gray-200">
+        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 divide-y divide-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
           <div className="px-4 py-3">
             <button
               onClick={handleSignOut}
               className="text-sm text-red-500 hover:text-red-600"
             >
               Logga ut
+            </button>
+          </div>
+          <div className="px-4 py-3">
+            <button
+              onClick={toggleDark}
+              className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
+            >
+              {isDark ? "Ljust läge" : "Mörkt läge"}
             </button>
           </div>
           <div className="px-4 py-3">
@@ -310,7 +320,7 @@ export default function ChecklistView({
                   return next;
                 })
               }
-              className="text-sm text-gray-700 hover:text-gray-900"
+              className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
             >
               {hideMode === "hide" ? "Visa avbockade" : "Dölj avbockade"}
             </button>
@@ -319,7 +329,9 @@ export default function ChecklistView({
             <div className="px-4 py-3">
               {clearConfirm ? (
                 <div className="flex items-center gap-3" role="alert">
-                  <span className="text-sm text-gray-600">Är du säker?</span>
+                  <span className="text-sm text-gray-600 dark:text-zinc-400">
+                    Är du säker?
+                  </span>
                   <button
                     onClick={() => {
                       setClearConfirm(false);
@@ -331,7 +343,7 @@ export default function ChecklistView({
                   </button>
                   <button
                     onClick={() => setClearConfirm(false)}
-                    className="text-sm text-gray-500 hover:text-gray-700"
+                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200"
                   >
                     Avbryt
                   </button>
@@ -349,18 +361,18 @@ export default function ChecklistView({
           <div className="px-4 py-3 space-y-2">
             <button
               onClick={handleInvite}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium dark:text-blue-400 dark:hover:text-blue-300"
             >
               {inviteUrl ? "Dölj inbjudningslänk" : "Bjud in"}
             </button>
             {inviteUrl && (
-              <div className="flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2">
-                <span className="flex-1 text-xs text-blue-700 truncate font-mono">
+              <div className="flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 dark:bg-blue-950 dark:border-blue-800">
+                <span className="flex-1 text-xs text-blue-700 truncate font-mono dark:text-blue-300">
                   {inviteUrl}
                 </span>
                 <button
                   onClick={handleCopy}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap flex-shrink-0"
+                  className="text-xs text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap flex-shrink-0 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   {copyLabel}
                 </button>
@@ -368,11 +380,13 @@ export default function ChecklistView({
             )}
           </div>
           <div className="px-4 py-3">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 dark:text-zinc-500">
               Tillgång
             </p>
             {members === null ? (
-              <p className="text-sm text-gray-400">Laddar…</p>
+              <p className="text-sm text-gray-400 dark:text-zinc-500">
+                Laddar…
+              </p>
             ) : membersError ? (
               <p className="text-sm text-red-400">
                 Kunde inte hämta medlemmar. Kör{" "}
@@ -380,17 +394,21 @@ export default function ChecklistView({
                 SQL-editorn.
               </p>
             ) : members.length === 0 ? (
-              <p className="text-sm text-gray-400">Inga medlemmar hittades.</p>
+              <p className="text-sm text-gray-400 dark:text-zinc-500">
+                Inga medlemmar hittades.
+              </p>
             ) : (
               <ul className="space-y-1">
                 {members.map((m) => (
                   <li
                     key={m.member_id}
-                    className="text-sm text-gray-600 flex items-center gap-1.5"
+                    className="text-sm text-gray-600 flex items-center gap-1.5 dark:text-zinc-400"
                   >
                     <span>{m.member_email}</span>
                     {m.member_id === userId && (
-                      <span className="text-xs text-gray-400">(du)</span>
+                      <span className="text-xs text-gray-400 dark:text-zinc-500">
+                        (du)
+                      </span>
                     )}
                   </li>
                 ))}
@@ -415,7 +433,7 @@ export default function ChecklistView({
           />
         ))}
         {visibleItems.length === 0 && (
-          <li className="text-center text-gray-400 py-8 text-sm">
+          <li className="text-center text-gray-400 py-8 text-sm dark:text-zinc-500">
             Inga saker i listan ännu.
           </li>
         )}

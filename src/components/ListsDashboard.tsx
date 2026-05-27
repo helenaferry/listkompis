@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useDarkMode } from "@/lib/useDarkMode";
 import {
   createList,
   setFavorite,
@@ -31,6 +32,7 @@ export default function ListsDashboard({
   const [editingName, setEditingName] = useState("");
   const [listMenuId, setListMenuId] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const { isDark, toggle: toggleDark } = useDarkMode();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,14 +105,14 @@ export default function ListsDashboard({
           Listkompis
         </p>
         <div className="flex items-center gap-2 text-sm flex-shrink-0">
-          <span className="text-gray-400 text-xs truncate max-w-[160px]">
+          <span className="text-gray-400 text-xs truncate max-w-[160px] dark:text-zinc-500">
             {userEmail}
           </span>
           <button
             onClick={() => setMenuOpen((o) => !o)}
             aria-label={menuOpen ? "Stäng meny" : "Öppna meny"}
             aria-expanded={menuOpen}
-            className="p-2 -mr-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 -mr-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors dark:text-zinc-500 dark:hover:text-zinc-300 dark:hover:bg-zinc-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -129,11 +131,19 @@ export default function ListsDashboard({
 
       {/* Expandable menu */}
       {menuOpen && (
-        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 divide-y divide-gray-200">
+        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 divide-y divide-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
+          <div className="px-4 py-3">
+            <button
+              onClick={toggleDark}
+              className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
+            >
+              {isDark ? "Ljust läge" : "Mörkt läge"}
+            </button>
+          </div>
           <div className="px-4 py-3">
             <a
               href="/hjalp"
-              className="text-sm text-gray-700 hover:text-gray-900"
+              className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
             >
               Hjälp
             </a>
@@ -149,7 +159,9 @@ export default function ListsDashboard({
         </div>
       )}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mina listor</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f0ead6]">
+          Mina listor
+        </h1>
       </div>
 
       <form onSubmit={handleCreate} className="flex gap-2 mb-6">
@@ -159,7 +171,7 @@ export default function ListsDashboard({
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Ny lista…"
           maxLength={100}
-          className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-[#f0ead6] dark:placeholder-zinc-500"
           disabled={creating}
         />
         <button
@@ -175,7 +187,7 @@ export default function ListsDashboard({
         {lists.map((list) => (
           <li
             key={list.id}
-            className="bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-100"
+            className="bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-100 dark:bg-zinc-800 dark:border-zinc-700 dark:shadow-none"
           >
             <div className="flex items-center gap-3">
               <button
@@ -188,7 +200,7 @@ export default function ListsDashboard({
                 className={`flex-shrink-0 hover:scale-110 transition-transform ${
                   list.is_favorite
                     ? "text-blue-600"
-                    : "text-gray-300 hover:text-gray-500"
+                    : "text-gray-300 hover:text-gray-500 dark:text-zinc-600 dark:hover:text-zinc-400"
                 }`}
                 aria-label={list.is_favorite ? "Ta bort nål" : "Nåla fast"}
               >
@@ -218,12 +230,12 @@ export default function ListsDashboard({
                     if (e.key === "Escape") setEditingId(null);
                   }}
                   maxLength={100}
-                  className="flex-1 bg-transparent border-b-2 border-blue-500 outline-none text-gray-800 font-medium min-w-0"
+                  className="flex-1 bg-transparent border-b-2 border-blue-500 outline-none text-gray-800 font-medium min-w-0 dark:text-[#f0ead6]"
                 />
               ) : (
                 <a
                   href={`/lista/${list.id}`}
-                  className="flex-1 text-gray-800 font-medium hover:text-blue-600 truncate"
+                  className="flex-1 text-gray-800 font-medium hover:text-blue-600 truncate dark:text-[#e8e2d6] dark:hover:text-blue-400"
                 >
                   {list.name}
                 </a>
@@ -240,7 +252,7 @@ export default function ListsDashboard({
                 }}
                 aria-label={`Alternativ för ${list.name}`}
                 aria-expanded={listMenuId === list.id}
-                className="flex-shrink-0 p-1 text-gray-300 hover:text-gray-500 transition-colors"
+                className="flex-shrink-0 p-1 text-gray-300 hover:text-gray-500 transition-colors dark:text-zinc-600 dark:hover:text-zinc-400"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -256,20 +268,26 @@ export default function ListsDashboard({
               </button>
             </div>
             {listMenuId === list.id && editingId !== list.id && (
-              <div className="mt-2 flex items-center gap-4 pl-9" role="group" aria-label={`Alternativ för ${list.name}`}>
+              <div
+                className="mt-2 flex items-center gap-4 pl-9"
+                role="group"
+                aria-label={`Alternativ för ${list.name}`}
+              >
                 <button
                   onClick={() => {
                     setEditingId(list.id);
                     setEditingName(list.name);
                     setListMenuId(null);
                   }}
-                  className="text-sm text-gray-600 hover:text-gray-900"
+                  className="text-sm text-gray-600 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-[#f0ead6]"
                 >
                   Byt namn
                 </button>
                 {confirmingId === list.id ? (
                   <div className="flex items-center gap-2" role="alert">
-                    <span className="text-sm text-gray-500">Är du säker?</span>
+                    <span className="text-sm text-gray-500 dark:text-zinc-400">
+                      Är du säker?
+                    </span>
                     <button
                       onClick={() =>
                         list.created_by === userId
@@ -282,7 +300,7 @@ export default function ListsDashboard({
                     </button>
                     <button
                       onClick={() => setConfirmingId(null)}
-                      className="text-sm text-gray-500 hover:text-gray-700"
+                      className="text-sm text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200"
                     >
                       Nej
                     </button>
@@ -302,7 +320,7 @@ export default function ListsDashboard({
           </li>
         ))}
         {lists.length === 0 && (
-          <li className="text-center text-gray-400 py-12 text-sm">
+          <li className="text-center text-gray-400 py-12 text-sm dark:text-zinc-500">
             Du har inga listor än. Skapa en ovan!
           </li>
         )}

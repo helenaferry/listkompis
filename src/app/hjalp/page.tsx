@@ -9,15 +9,17 @@ export default function HjalpPage() {
       <div className="mb-3">
         <a
           href="/listor"
-          className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 inline-block"
+          className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 inline-block dark:text-blue-400"
         >
           Listkompis
         </a>
       </div>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Hjälp</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-8 dark:text-[#f0ead6]">
+        Hjälp
+      </h1>
 
-      <div className="space-y-8 text-gray-700">
+      <div className="space-y-8 text-gray-700 dark:text-[#d0ccc4] dark:[&_h2]:text-[#f0ead6]">
         <section>
           <h2 className="text-base font-semibold text-gray-900 mb-2">
             Skapa en lista

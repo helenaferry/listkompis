@@ -24,11 +24,11 @@ export default function NewItemRow({ onAdd }: Props) {
   };
 
   return (
-    <li className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 shadow-sm border border-dashed border-gray-200">
+    <li className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 shadow-sm border border-dashed border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 dark:shadow-none">
       <input
         type="checkbox"
         disabled
-        className="h-5 w-5 rounded border-gray-200 flex-shrink-0 opacity-25"
+        className="h-5 w-5 rounded border-gray-200 flex-shrink-0 opacity-25 dark:border-zinc-600"
         aria-hidden
       />
       <input
@@ -39,7 +39,7 @@ export default function NewItemRow({ onAdd }: Props) {
         onKeyDown={handleKeyDown}
         placeholder="Lägg till…"
         maxLength={500}
-        className="flex-1 text-gray-800 bg-transparent focus:outline-none placeholder-gray-300"
+        className="flex-1 text-gray-800 bg-transparent focus:outline-none placeholder-gray-300 dark:text-[#e8e2d6] dark:placeholder-zinc-600"
         aria-label="Ny sak i listan"
       />
     </li>

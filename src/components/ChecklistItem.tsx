@@ -39,12 +39,12 @@ export default function ChecklistItem({ item, onToggle, onEdit }: Props) {
   };
 
   return (
-    <li className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-100">
+    <li className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-100 dark:bg-zinc-800 dark:border-zinc-700 dark:shadow-none">
       <input
         type="checkbox"
         checked={item.is_checked}
         onChange={(e) => onToggle(item.id, e.target.checked)}
-        className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0"
+        className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0 dark:border-zinc-600"
         aria-label={`Bocka av: ${item.text}`}
       />
       {editing ? (
@@ -56,7 +56,7 @@ export default function ChecklistItem({ item, onToggle, onEdit }: Props) {
           onKeyDown={handleKeyDown}
           maxLength={500}
           autoFocus
-          className="flex-1 text-gray-800 bg-transparent border-b border-blue-400 focus:outline-none"
+          className="flex-1 text-gray-800 bg-transparent border-b border-blue-400 focus:outline-none dark:text-[#f0ead6]"
           aria-label="Redigera"
         />
       ) : (
@@ -71,8 +71,10 @@ export default function ChecklistItem({ item, onToggle, onEdit }: Props) {
             }
           }}
           aria-label={`Redigera: ${item.text}`}
-          className={`flex-1 text-gray-800 break-words cursor-text ${
-            item.is_checked ? "line-through text-gray-400" : ""
+          className={`flex-1 text-gray-800 break-words cursor-text dark:text-[#e8e2d6] ${
+            item.is_checked
+              ? "line-through text-gray-400 dark:text-zinc-600"
+              : ""
           }`}
         >
           {item.text}
