@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
-  setFavorite,
-  removeFavorite,
   getOrCreateInvite,
   renameList,
   getListMembers,
@@ -36,12 +34,10 @@ export default function ChecklistView({
   initialItems,
   userId,
   userEmail,
-  isFavorite: initialIsFavorite,
 }: Props) {
   const [items, setItems] = useState<Item[]>(initialItems);
   const [hideMode, setHideMode] = useState<HideMode>("strike");
   const [prefLoaded, setPrefLoaded] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [copyLabel, setCopyLabel] = useState("Kopiera");
   const [currentName, setCurrentName] = useState(listName);
@@ -162,16 +158,6 @@ export default function ChecklistView({
     }
   };
 
-  const handleFavoriteToggle = async () => {
-    if (isFavorite) {
-      await removeFavorite(listId);
-      setIsFavorite(false);
-    } else {
-      await setFavorite(listId);
-      setIsFavorite(true);
-    }
-  };
-
   const handleInvite = async () => {
     if (inviteUrl) {
       setInviteUrl(null);
@@ -225,7 +211,7 @@ export default function ChecklistView({
   return (
     <div className="max-w-lg mx-auto px-4 pt-4 pb-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <a
           href="/listor"
           className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 pr-4"
@@ -270,18 +256,6 @@ export default function ChecklistView({
               {currentName}
             </h1>
           )}
-          <button
-            onClick={handleFavoriteToggle}
-            title={
-              isFavorite
-                ? "Ta bort favorit"
-                : "Markera som favorit – öppnas direkt vid inloggning"
-            }
-            className="text-xl leading-none flex-shrink-0 hover:scale-110 transition-transform"
-            aria-label={isFavorite ? "Ta bort favorit" : "Markera som favorit"}
-          >
-            {isFavorite ? "⭐" : "☆"}
-          </button>
         </div>
         <button
           onClick={handleMenuToggle}

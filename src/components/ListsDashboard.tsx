@@ -49,8 +49,8 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
   };
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-1">
+    <div className="max-w-lg mx-auto px-4 pt-4 pb-8">
+      <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-semibold tracking-widest text-blue-600 uppercase">
           Listkompis
         </p>
@@ -99,15 +99,30 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
               onClick={() => handleFavorite(list.id, list.is_favorite)}
               title={
                 list.is_favorite
-                  ? "Ta bort favorit"
-                  : "Markera som favorit – öppnas direkt vid inloggning"
+                  ? "Ta bort nål"
+                  : "Nåla fast – öppnas direkt vid inloggning"
               }
-              className="text-xl leading-none flex-shrink-0 hover:scale-110 transition-transform"
-              aria-label={
-                list.is_favorite ? "Ta bort favorit" : "Markera som favorit"
-              }
+              className={`flex-shrink-0 hover:scale-110 transition-transform ${
+                list.is_favorite
+                  ? "text-blue-600"
+                  : "text-gray-300 hover:text-gray-500"
+              }`}
+              aria-label={list.is_favorite ? "Ta bort nål" : "Nåla fast"}
             >
-              {list.is_favorite ? "⭐" : "☆"}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill={list.is_favorite ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="12" y1="17" x2="12" y2="22" />
+                <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z" />
+              </svg>
             </button>
             <a
               href={`/lista/${list.id}`}
