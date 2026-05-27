@@ -158,6 +158,9 @@ export default function ChecklistView({
   return (
     <div className="max-w-lg mx-auto px-4 py-8">
       {/* Header */}
+      <p className="text-xs font-semibold tracking-widest text-blue-600 uppercase mb-1">
+        Listkompis
+      </p>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3 min-w-0">
           <a
@@ -188,7 +191,9 @@ export default function ChecklistView({
           </div>
         </div>
         <div className="flex items-center gap-3 text-sm flex-shrink-0">
-          <span className="text-gray-400 text-xs truncate max-w-[160px]">{userEmail}</span>
+          <span className="text-gray-400 text-xs truncate max-w-[160px]">
+            {userEmail}
+          </span>
           <button
             onClick={handleSignOut}
             className="text-gray-500 hover:text-gray-700 underline underline-offset-2"
