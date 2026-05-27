@@ -55,9 +55,12 @@ export default function ChecklistView({
           event: "*",
           schema: "public",
           table: "items",
-          filter: `list_id=eq.${listId}`,
         },
         (payload) => {
+          // Filter client-side – more reliable than server-side filter
+          const row = (payload.new ?? payload.old) as Item | undefined;
+          if (row && row.list_id !== listId) return;
+
           if (payload.eventType === "INSERT") {
             setItems((prev) =>
               prev.some((i) => i.id === (payload.new as Item).id)
@@ -77,7 +80,9 @@ export default function ChecklistView({
           }
         },
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) console.error("[Realtime] channel error:", err);
+      });
 
     return () => {
       supabase.removeChannel(channel);
