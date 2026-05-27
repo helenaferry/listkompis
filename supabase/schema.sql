@@ -262,4 +262,8 @@ $$;
 
 -- ─── Realtime ─────────────────────────────────────────────────────────────────
 
+-- REPLICA IDENTITY FULL is required for filtered subscriptions (list_id=eq.x)
+-- to work correctly for UPDATE and DELETE events.
+alter table public.items replica identity full;
+
 alter publication supabase_realtime add table public.items;
