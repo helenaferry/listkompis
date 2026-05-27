@@ -32,7 +32,7 @@ export default async function ListPage({
   // Verify membership and get list info
   const { data: membership } = await supabase
     .from("list_members")
-    .select("is_favorite, lists(id, name)")
+    .select("is_favorite, lists(id, name, created_by)")
     .eq("list_id", id)
     .eq("user_id", user.id)
     .single();
@@ -40,12 +40,12 @@ export default async function ListPage({
   if (!membership) notFound();
 
   const rawList = membership.lists as
-    | { id: string; name: string }
-    | { id: string; name: string }[]
+    | { id: string; name: string; created_by: string | null }
+    | { id: string; name: string; created_by: string | null }[]
     | null;
   const list = Array.isArray(rawList)
     ? rawList[0]
-    : (rawList as { id: string; name: string });
+    : (rawList as { id: string; name: string; created_by: string | null });
 
   const { data: items } = await supabase
     .from("items")
@@ -62,6 +62,7 @@ export default async function ListPage({
         userId={user.id}
         userEmail={user.email ?? ""}
         isFavorite={membership.is_favorite}
+        createdBy={list.created_by}
       />
     </main>
   );

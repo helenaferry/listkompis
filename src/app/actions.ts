@@ -89,6 +89,18 @@ export async function deleteCheckedItems(listId: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function removeListMember(
+  listId: string,
+  memberId: string,
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("remove_list_member", {
+    p_list_id: listId,
+    p_member_id: memberId,
+  });
+  if (error) throw new Error(error.message);
+}
+
 export async function deleteList(listId: string): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("delete_list", { p_list_id: listId });

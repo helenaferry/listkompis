@@ -8,6 +8,7 @@ import {
   renameList,
   getListMembers,
   deleteCheckedItems,
+  removeListMember,
 } from "@/app/actions";
 import ChecklistItem from "./ChecklistItem";
 import NewItemRow from "./NewItemRow";
@@ -28,6 +29,7 @@ interface Props {
   userId: string;
   userEmail: string;
   isFavorite: boolean;
+  createdBy: string | null;
 }
 
 export default function ChecklistView({
@@ -36,6 +38,7 @@ export default function ChecklistView({
   initialItems,
   userId,
   userEmail,
+  createdBy,
 }: Props) {
   const [items, setItems] = useState<Item[]>(initialItems);
   const [hideMode, setHideMode] = useState<HideMode>("strike");
@@ -48,6 +51,7 @@ export default function ChecklistView({
   const [members, setMembers] = useState<ListMember[] | null>(null);
   const [membersError, setMembersError] = useState(false);
   const [clearConfirm, setClearConfirm] = useState(false);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const { isDark, toggle: toggleDark } = useDarkMode();
 
   useEffect(() => {
@@ -398,18 +402,61 @@ export default function ChecklistView({
                 Inga medlemmar hittades.
               </p>
             ) : (
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {members.map((m) => (
                   <li
                     key={m.member_id}
-                    className="text-sm text-gray-600 flex items-center gap-1.5 dark:text-zinc-400"
+                    className="text-sm flex items-center gap-1.5"
                   >
-                    <span>{m.member_email}</span>
-                    {m.member_id === userId && (
-                      <span className="text-xs text-gray-400 dark:text-zinc-500">
+                    <span className="flex-1 text-gray-600 dark:text-zinc-400 truncate">
+                      {m.member_email}
+                    </span>
+                    {m.member_id === createdBy && (
+                      <span className="text-xs text-blue-500 dark:text-blue-400 flex-shrink-0">
+                        ägare
+                      </span>
+                    )}
+                    {m.member_id === userId && m.member_id !== createdBy && (
+                      <span className="text-xs text-gray-400 dark:text-zinc-500 flex-shrink-0">
                         (du)
                       </span>
                     )}
+                    {userId === createdBy &&
+                      m.member_id !== createdBy &&
+                      (removingMemberId === m.member_id ? (
+                        <div className="flex items-center gap-1.5 flex-shrink-0" role="alert">
+                          <span className="text-xs text-gray-500 dark:text-zinc-400">Ta bort?</span>
+                          <button
+                            onClick={async () => {
+                              setMembers((prev) =>
+                                prev ? prev.filter((x) => x.member_id !== m.member_id) : prev,
+                              );
+                              setRemovingMemberId(null);
+                              await removeListMember(listId, m.member_id);
+                            }}
+                            className="text-xs text-red-500 hover:text-red-600 font-medium"
+                          >
+                            Ja
+                          </button>
+                          <button
+                            onClick={() => setRemovingMemberId(null)}
+                            className="text-xs text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+                          >
+                            Nej
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setRemovingMemberId(m.member_id)}
+                          aria-label={`Ta bort ${m.member_email}`}
+                          className="flex-shrink-0 text-gray-300 hover:text-red-400 dark:text-zinc-600 dark:hover:text-red-400 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </button>
+                      ))}
                   </li>
                 ))}
               </ul>

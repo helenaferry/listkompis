@@ -359,3 +359,27 @@ begin
   where list_id = p_list_id and user_id = v_user_id;
 end;
 $$;
+
+create or replace function public.remove_list_member(p_list_id uuid, p_member_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_creator_id uuid;
+begin
+  select created_by into v_creator_id from public.lists where id = p_list_id;
+
+  if v_creator_id is null or v_creator_id != auth.uid() then
+    raise exception 'Only the list creator can remove members';
+  end if;
+
+  if p_member_id = v_creator_id then
+    raise exception 'Cannot remove the list creator';
+  end if;
+
+  delete from public.list_members
+  where list_id = p_list_id and user_id = p_member_id;
+end;
+$$;
