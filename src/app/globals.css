@@ -33,3 +33,8 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Override Tailwind's bg-gray-50 on <main> in dark mode */
+.dark main {
+  background: var(--background);
+}
