@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { setFavorite, removeFavorite, getOrCreateInvite, renameList } from "@/app/actions";
+import {
+  setFavorite,
+  removeFavorite,
+  getOrCreateInvite,
+  renameList,
+} from "@/app/actions";
 import ChecklistItem from "./ChecklistItem";
 import NewItemRow from "./NewItemRow";
 import type { Item } from "@/lib/types";
@@ -192,7 +197,9 @@ export default function ChecklistView({
                 onBlur={handleNameSave}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") e.currentTarget.blur();
-                  if (e.key === "Escape") { setEditingName(null); }
+                  if (e.key === "Escape") {
+                    setEditingName(null);
+                  }
                 }}
                 maxLength={100}
                 className="text-2xl font-bold text-gray-900 bg-transparent border-b-2 border-blue-500 outline-none min-w-0 w-full"
