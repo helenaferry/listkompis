@@ -267,3 +267,31 @@ $$;
 alter table public.items replica identity full;
 
 alter publication supabase_realtime add table public.items;
+
+create or replace function public.get_list_members(p_list_id uuid)
+returns table(member_id uuid, member_email text, member_joined_at timestamptz)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then raise exception 'Not authenticated'; end if;
+
+  if not exists (
+    select 1 from public.list_members lm0
+    where lm0.list_id = p_list_id and lm0.user_id = v_user_id
+  ) then
+    raise exception 'Not a member of this list';
+  end if;
+
+  return query
+  select lm.user_id, u.email::text, lm.joined_at
+  from public.list_members lm
+  join auth.users u on u.id = lm.user_id
+  where lm.list_id = p_list_id
+  order by lm.joined_at;
+end;
+$$;

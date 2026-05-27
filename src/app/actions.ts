@@ -64,6 +64,23 @@ export async function renameList(
   revalidatePath("/listor");
 }
 
+export async function getListMembers(
+  listId: string,
+): Promise<
+  { member_id: string; member_email: string; member_joined_at: string }[]
+> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_list_members", {
+    p_list_id: listId,
+  });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as {
+    member_id: string;
+    member_email: string;
+    member_joined_at: string;
+  }[];
+}
+
 export async function joinListWithToken(token: string): Promise<void> {
   const supabase = await createClient();
   const { data: listId, error } = await supabase.rpc("join_list_with_token", {
