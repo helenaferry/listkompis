@@ -89,6 +89,20 @@ export async function deleteCheckedItems(listId: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function deleteList(listId: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_list", { p_list_id: listId });
+  if (error) throw new Error(error.message);
+  revalidatePath("/listor");
+}
+
+export async function leaveList(listId: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("leave_list", { p_list_id: listId });
+  if (error) throw new Error(error.message);
+  revalidatePath("/listor");
+}
+
 export async function joinListWithToken(token: string): Promise<void> {
   const supabase = await createClient();
   const { data: listId, error } = await supabase.rpc("join_list_with_token", {

@@ -46,6 +46,7 @@ export default function ChecklistView({
   const [menuOpen, setMenuOpen] = useState(false);
   const [members, setMembers] = useState<ListMember[] | null>(null);
   const [membersError, setMembersError] = useState(false);
+  const [clearConfirm, setClearConfirm] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(
@@ -310,12 +311,33 @@ export default function ChecklistView({
           </div>
           {items.some((i) => i.is_checked) && (
             <div className="px-4 py-3">
-              <button
-                onClick={handleClearChecked}
-                className="text-sm text-red-500 hover:text-red-600"
-              >
-                Rensa avbockade
-              </button>
+              {clearConfirm ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600">Är du säker?</span>
+                  <button
+                    onClick={() => {
+                      setClearConfirm(false);
+                      handleClearChecked();
+                    }}
+                    className="text-sm text-red-500 hover:text-red-600 font-medium"
+                  >
+                    Ja, rensa
+                  </button>
+                  <button
+                    onClick={() => setClearConfirm(false)}
+                    className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    Avbryt
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setClearConfirm(true)}
+                  className="text-sm text-red-500 hover:text-red-600"
+                >
+                  Rensa avbockade
+                </button>
+              )}
             </div>
           )}
           <div className="px-4 py-3 space-y-2">

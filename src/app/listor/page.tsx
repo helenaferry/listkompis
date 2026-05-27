@@ -25,31 +25,47 @@ export default async function ListsPage() {
 
   const { data: memberships } = await supabase
     .from("list_members")
-    .select("list_id, is_favorite, lists(id, name, created_at)")
+    .select("list_id, is_favorite, lists(id, name, created_at, created_by)")
     .eq("user_id", user.id)
     .order("joined_at", { ascending: true });
 
   const lists: ListEntry[] = (memberships ?? []).map((m) => {
     const rawL = m.lists as
-      | { id: string; name: string; created_at: string }
-      | { id: string; name: string; created_at: string }[]
+      | {
+          id: string;
+          name: string;
+          created_at: string;
+          created_by: string | null;
+        }
+      | {
+          id: string;
+          name: string;
+          created_at: string;
+          created_by: string | null;
+        }[]
       | null;
     const l = (Array.isArray(rawL) ? rawL[0] : rawL) as {
       id: string;
       name: string;
       created_at: string;
+      created_by: string | null;
     };
     return {
       id: l.id,
       name: l.name,
       created_at: l.created_at,
       is_favorite: m.is_favorite,
+      created_by: l.created_by,
     };
   });
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <ListsDashboard initialLists={lists} userEmail={user.email ?? ""} />
+      <ListsDashboard
+        initialLists={lists}
+        userEmail={user.email ?? ""}
+        userId={user.id}
+      />
     </main>
   );
 }

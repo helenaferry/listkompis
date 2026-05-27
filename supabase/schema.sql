@@ -319,3 +319,43 @@ begin
   where list_id = p_list_id and is_checked = true;
 end;
 $$;
+
+create or replace function public.delete_list(p_list_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then raise exception 'Not authenticated'; end if;
+
+  if not exists (
+    select 1 from public.lists
+    where id = p_list_id and created_by = v_user_id
+  ) then
+    raise exception 'Only the list creator can delete it';
+  end if;
+
+  delete from public.lists where id = p_list_id;
+end;
+$$;
+
+create or replace function public.leave_list(p_list_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then raise exception 'Not authenticated'; end if;
+
+  delete from public.list_members
+  where list_id = p_list_id and user_id = v_user_id;
+end;
+$$;

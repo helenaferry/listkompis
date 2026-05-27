@@ -42,6 +42,7 @@ export default function DevListsDashboard() {
       name,
       created_at: new Date().toISOString(),
       is_favorite: false,
+      created_by: null,
     };
     updateLists([...lists, newList]);
     setNewName("");

@@ -7,21 +7,30 @@ import {
   setFavorite,
   removeFavorite,
   renameList,
+  deleteList,
+  leaveList,
 } from "@/app/actions";
 import type { ListEntry } from "@/lib/types";
 
 interface Props {
   initialLists: ListEntry[];
   userEmail: string;
+  userId: string;
 }
 
-export default function ListsDashboard({ initialLists, userEmail }: Props) {
+export default function ListsDashboard({
+  initialLists,
+  userEmail,
+  userId,
+}: Props) {
   const [lists, setLists] = useState<ListEntry[]>(initialLists);
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [listMenuId, setListMenuId] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +45,7 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
       name,
       created_at: new Date().toISOString(),
       is_favorite: false,
+      created_by: userId,
     };
     setLists((prev) => [newEntry, ...prev]);
   };
@@ -64,6 +74,20 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
       prev.map((l) => (l.id === editingId ? { ...l, name: trimmed } : l)),
     );
     await renameList(editingId, trimmed);
+  };
+
+  const handleDelete = async (listId: string) => {
+    setListMenuId(null);
+    setConfirmingId(null);
+    setLists((prev) => prev.filter((l) => l.id !== listId));
+    await deleteList(listId);
+  };
+
+  const handleLeave = async (listId: string) => {
+    setListMenuId(null);
+    setConfirmingId(null);
+    setLists((prev) => prev.filter((l) => l.id !== listId));
+    await leaveList(listId);
   };
 
   const handleSignOut = async () => {
@@ -151,81 +175,129 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
         {lists.map((list) => (
           <li
             key={list.id}
-            className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-100"
+            className="bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-100"
           >
-            <button
-              onClick={() => handleFavorite(list.id, list.is_favorite)}
-              title={
-                list.is_favorite
-                  ? "Ta bort nål"
-                  : "Nåla fast – öppnas direkt vid inloggning"
-              }
-              className={`flex-shrink-0 hover:scale-110 transition-transform ${
-                list.is_favorite
-                  ? "text-blue-600"
-                  : "text-gray-300 hover:text-gray-500"
-              }`}
-              aria-label={list.is_favorite ? "Ta bort nål" : "Nåla fast"}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill={list.is_favorite ? "currentColor" : "none"}
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleFavorite(list.id, list.is_favorite)}
+                title={
+                  list.is_favorite
+                    ? "Ta bort nål"
+                    : "Nåla fast – öppnas direkt vid inloggning"
+                }
+                className={`flex-shrink-0 hover:scale-110 transition-transform ${
+                  list.is_favorite
+                    ? "text-blue-600"
+                    : "text-gray-300 hover:text-gray-500"
+                }`}
+                aria-label={list.is_favorite ? "Ta bort nål" : "Nåla fast"}
               >
-                <line x1="12" y1="17" x2="12" y2="22" />
-                <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z" />
-              </svg>
-            </button>
-            {editingId === list.id ? (
-              <input
-                autoFocus
-                value={editingName}
-                onChange={(e) => setEditingName(e.target.value)}
-                onBlur={handleRenameSave}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") e.currentTarget.blur();
-                  if (e.key === "Escape") setEditingId(null);
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill={list.is_favorite ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="12" y1="17" x2="12" y2="22" />
+                  <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z" />
+                </svg>
+              </button>
+              {editingId === list.id ? (
+                <input
+                  autoFocus
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                  onBlur={handleRenameSave}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.currentTarget.blur();
+                    if (e.key === "Escape") setEditingId(null);
+                  }}
+                  maxLength={100}
+                  className="flex-1 bg-transparent border-b-2 border-blue-500 outline-none text-gray-800 font-medium min-w-0"
+                />
+              ) : (
+                <a
+                  href={`/lista/${list.id}`}
+                  className="flex-1 text-gray-800 font-medium hover:text-blue-600 truncate"
+                >
+                  {list.name}
+                </a>
+              )}
+              <button
+                onClick={() => {
+                  if (listMenuId === list.id) {
+                    setListMenuId(null);
+                    setConfirmingId(null);
+                  } else {
+                    setListMenuId(list.id);
+                    setConfirmingId(null);
+                  }
                 }}
-                maxLength={100}
-                className="flex-1 bg-transparent border-b-2 border-blue-500 outline-none text-gray-800 font-medium min-w-0"
-              />
-            ) : (
-              <a
-                href={`/lista/${list.id}`}
-                className="flex-1 text-gray-800 font-medium hover:text-blue-600 truncate"
+                aria-label="Listalternativ"
+                className="flex-shrink-0 p-1 text-gray-300 hover:text-gray-500 transition-colors"
               >
-                {list.name}
-              </a>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <circle cx="12" cy="5" r="1.5" />
+                  <circle cx="12" cy="12" r="1.5" />
+                  <circle cx="12" cy="19" r="1.5" />
+                </svg>
+              </button>
+            </div>
+            {listMenuId === list.id && editingId !== list.id && (
+              <div className="mt-2 flex items-center gap-4 pl-9">
+                <button
+                  onClick={() => {
+                    setEditingId(list.id);
+                    setEditingName(list.name);
+                    setListMenuId(null);
+                  }}
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Byt namn
+                </button>
+                {confirmingId === list.id ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Är du säker?</span>
+                    <button
+                      onClick={() =>
+                        list.created_by === userId
+                          ? handleDelete(list.id)
+                          : handleLeave(list.id)
+                      }
+                      className="text-sm text-red-500 hover:text-red-600 font-medium"
+                    >
+                      Ja
+                    </button>
+                    <button
+                      onClick={() => setConfirmingId(null)}
+                      className="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Nej
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmingId(list.id)}
+                    className="text-sm text-red-400 hover:text-red-600"
+                  >
+                    {list.created_by === userId
+                      ? "Ta bort lista"
+                      : "Lämna lista"}
+                  </button>
+                )}
+              </div>
             )}
-            <button
-              onClick={() => {
-                setEditingId(list.id);
-                setEditingName(list.name);
-              }}
-              aria-label="Byt namn"
-              className="flex-shrink-0 p-1 text-gray-300 hover:text-gray-500 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-            </button>
           </li>
         ))}
         {lists.length === 0 && (
