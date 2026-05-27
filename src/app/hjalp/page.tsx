@@ -1,19 +1,32 @@
+import HjalpHeader from "@/components/HjalpHeader";
+
 export const metadata = {
   title: "Hjälp – Listkompis",
 };
 
-export default function HjalpPage() {
+const isDevMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_DEV_MODE === "true";
+
+export default async function HjalpPage() {
+  let userEmail: string | undefined;
+
+  if (!isDevMode) {
+    try {
+      const { createClient } = await import("@/lib/supabase/server");
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      userEmail = user?.email ?? undefined;
+    } catch {
+      // Not authenticated – page is publicly accessible
+    }
+  }
+
   return (
     <div className="max-w-lg mx-auto px-4 pt-4 pb-12">
-      {/* Header */}
-      <div className="mb-3">
-        <a
-          href="/listor"
-          className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 inline-block dark:text-blue-400"
-        >
-          Listkompis
-        </a>
-      </div>
+      <HjalpHeader userEmail={userEmail} />
 
       <h1 className="text-2xl font-bold text-gray-900 mb-8 dark:text-[#f0ead6]">
         Hjälp
