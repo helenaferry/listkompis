@@ -32,17 +32,21 @@ export default function ChecklistView({
   isFavorite: initialIsFavorite,
 }: Props) {
   const [items, setItems] = useState<Item[]>(initialItems);
-  const [hideMode, setHideMode] = useState<HideMode>(() => {
-    if (typeof window === "undefined") return "strike";
-    return (
-      (localStorage.getItem("listkompis_hideMode") as HideMode) ?? "strike"
-    );
-  });
+  const [hideMode, setHideMode] = useState<HideMode>("strike");
+  const [prefLoaded, setPrefLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [copyLabel, setCopyLabel] = useState("Kopiera");
   const [currentName, setCurrentName] = useState(listName);
   const [editingName, setEditingName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(
+      "listkompis_hideMode",
+    ) as HideMode | null;
+    if (saved) setHideMode(saved);
+    setPrefLoaded(true);
+  }, []);
   const [rtStatus, setRtStatus] = useState<string>("connecting");
 
   useEffect(() => {
@@ -307,7 +311,9 @@ export default function ChecklistView({
       )}
 
       {/* List */}
-      <ul className="space-y-2">
+      <ul
+        className={`space-y-2 transition-opacity duration-100 ${prefLoaded ? "opacity-100" : "opacity-0"}`}
+      >
         <NewItemRow onAdd={handleAdd} />
         {visibleItems.map((item) => (
           <ChecklistItem
