@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { setFavorite, removeFavorite, getOrCreateInvite } from "@/app/actions";
+import { setFavorite, removeFavorite, getOrCreateInvite, renameList } from "@/app/actions";
 import ChecklistItem from "./ChecklistItem";
 import NewItemRow from "./NewItemRow";
 import type { Item } from "@/lib/types";
@@ -36,6 +36,8 @@ export default function ChecklistView({
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [copyLabel, setCopyLabel] = useState("Kopiera");
+  const [currentName, setCurrentName] = useState(listName);
+  const [editingName, setEditingName] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -152,6 +154,17 @@ export default function ChecklistView({
     window.location.href = "/login";
   };
 
+  const handleNameSave = async () => {
+    const trimmed = editingName?.trim();
+    if (!trimmed || trimmed === currentName) {
+      setEditingName(null);
+      return;
+    }
+    setCurrentName(trimmed);
+    setEditingName(null);
+    await renameList(listId, trimmed);
+  };
+
   const visibleItems =
     hideMode === "hide" ? items.filter((i) => !i.is_checked) : items;
 
@@ -171,9 +184,28 @@ export default function ChecklistView({
             ←
           </a>
           <div className="flex items-center gap-2 min-w-0">
-            <h1 className="text-2xl font-bold text-gray-900 truncate">
-              {listName}
-            </h1>
+            {editingName !== null ? (
+              <input
+                autoFocus
+                value={editingName}
+                onChange={(e) => setEditingName(e.target.value)}
+                onBlur={handleNameSave}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.currentTarget.blur();
+                  if (e.key === "Escape") { setEditingName(null); }
+                }}
+                maxLength={100}
+                className="text-2xl font-bold text-gray-900 bg-transparent border-b-2 border-blue-500 outline-none min-w-0 w-full"
+              />
+            ) : (
+              <h1
+                className="text-2xl font-bold text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={() => setEditingName(currentName)}
+                title="Klicka för att byta namn"
+              >
+                {currentName}
+              </h1>
+            )}
             <button
               onClick={handleFavoriteToggle}
               title={

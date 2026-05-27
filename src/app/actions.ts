@@ -50,6 +50,20 @@ export async function getOrCreateInvite(listId: string): Promise<string> {
   return token as string;
 }
 
+export async function renameList(
+  listId: string,
+  newName: string,
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("rename_list", {
+    p_list_id: listId,
+    p_name: newName.trim(),
+  });
+  if (error) throw new Error(error.message);
+  revalidatePath(`/lista/${listId}`);
+  revalidatePath("/listor");
+}
+
 export async function joinListWithToken(token: string): Promise<void> {
   const supabase = await createClient();
   const { data: listId, error } = await supabase.rpc("join_list_with_token", {

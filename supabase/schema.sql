@@ -212,6 +212,29 @@ begin
 end;
 $$;
 
+create or replace function public.rename_list(p_list_id uuid, p_name text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then raise exception 'Not authenticated'; end if;
+
+  if not exists (
+    select 1 from public.list_members
+    where list_id = p_list_id and user_id = v_user_id
+  ) then
+    raise exception 'Not a member of this list';
+  end if;
+
+  update public.lists set name = p_name where id = p_list_id;
+end;
+$$;
+
 create or replace function public.join_list_with_token(p_token text)
 returns uuid
 language plpgsql
