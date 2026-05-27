@@ -239,6 +239,7 @@ create or replace function public.join_list_with_token(p_token text)
 returns uuid
 language plpgsql
 security definer
+set search_path = public
 as $$
 declare
   v_list_id uuid;
