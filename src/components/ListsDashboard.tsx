@@ -53,7 +53,7 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mina listor</h1>
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-gray-400 hidden sm:block">{userEmail}</span>
+          <span className="text-gray-400 text-xs truncate max-w-[160px]">{userEmail}</span>
           <button
             onClick={handleSignOut}
             className="text-gray-500 hover:text-gray-700 underline underline-offset-2"

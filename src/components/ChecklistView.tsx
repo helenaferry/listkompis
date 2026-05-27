@@ -188,7 +188,7 @@ export default function ChecklistView({
           </div>
         </div>
         <div className="flex items-center gap-3 text-sm flex-shrink-0">
-          <span className="text-gray-400 hidden sm:block">{userEmail}</span>
+          <span className="text-gray-400 text-xs truncate max-w-[160px]">{userEmail}</span>
           <button
             onClick={handleSignOut}
             className="text-gray-500 hover:text-gray-700 underline underline-offset-2"
