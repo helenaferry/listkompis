@@ -295,3 +295,27 @@ begin
   order by lm.joined_at;
 end;
 $$;
+
+create or replace function public.delete_checked_items(p_list_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then raise exception 'Not authenticated'; end if;
+
+  if not exists (
+    select 1 from public.list_members
+    where list_id = p_list_id and user_id = v_user_id
+  ) then
+    raise exception 'Not a member of this list';
+  end if;
+
+  delete from public.items
+  where list_id = p_list_id and is_checked = true;
+end;
+$$;

@@ -81,6 +81,14 @@ export async function getListMembers(
   }[];
 }
 
+export async function deleteCheckedItems(listId: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_checked_items", {
+    p_list_id: listId,
+  });
+  if (error) throw new Error(error.message);
+}
+
 export async function joinListWithToken(token: string): Promise<void> {
   const supabase = await createClient();
   const { data: listId, error } = await supabase.rpc("join_list_with_token", {

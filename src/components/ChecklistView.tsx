@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { getOrCreateInvite, renameList, getListMembers } from "@/app/actions";
+import {
+  getOrCreateInvite,
+  renameList,
+  getListMembers,
+  deleteCheckedItems,
+} from "@/app/actions";
 import ChecklistItem from "./ChecklistItem";
 import NewItemRow from "./NewItemRow";
 import type { Item } from "@/lib/types";
@@ -187,6 +192,11 @@ export default function ChecklistView({
     await renameList(listId, trimmed);
   };
 
+  const handleClearChecked = async () => {
+    setItems((prev) => prev.filter((i) => !i.is_checked));
+    await deleteCheckedItems(listId);
+  };
+
   const handleMenuToggle = async () => {
     const next = !menuOpen;
     setMenuOpen(next);
@@ -298,6 +308,16 @@ export default function ChecklistView({
               {hideMode === "hide" ? "Visa avbockade" : "Dölj avbockade"}
             </button>
           </div>
+          {items.some((i) => i.is_checked) && (
+            <div className="px-4 py-3">
+              <button
+                onClick={handleClearChecked}
+                className="text-sm text-red-500 hover:text-red-600"
+              >
+                Rensa avbockade
+              </button>
+            </div>
+          )}
           <div className="px-4 py-3 space-y-2">
             <button
               onClick={handleInvite}
