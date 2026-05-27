@@ -48,6 +48,7 @@ export default function ChecklistView({
   const [editingName, setEditingName] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [members, setMembers] = useState<ListMember[] | null>(null);
+  const [membersError, setMembersError] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(
@@ -212,6 +213,7 @@ export default function ChecklistView({
         const data = await getListMembers(listId);
         setMembers(data);
       } catch {
+        setMembersError(true);
         setMembers([]);
       }
     }
@@ -239,12 +241,6 @@ export default function ChecklistView({
           <span className="text-gray-400 text-xs truncate max-w-[160px]">
             {userEmail}
           </span>
-          <button
-            onClick={handleSignOut}
-            className="text-gray-500 hover:text-gray-700 underline underline-offset-2"
-          >
-            Logga ut
-          </button>
         </div>
       </div>
       {/* Title row */}
@@ -312,6 +308,14 @@ export default function ChecklistView({
         <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 divide-y divide-gray-200">
           <div className="px-4 py-3">
             <button
+              onClick={handleSignOut}
+              className="text-sm text-red-500 hover:text-red-600"
+            >
+              Logga ut
+            </button>
+          </div>
+          <div className="px-4 py-3">
+            <button
               onClick={() =>
                 setHideMode((m) => {
                   const next = m === "strike" ? "hide" : "strike";
@@ -351,6 +355,12 @@ export default function ChecklistView({
             </p>
             {members === null ? (
               <p className="text-sm text-gray-400">Laddar…</p>
+            ) : membersError ? (
+              <p className="text-sm text-red-400">
+                Kunde inte hämta medlemmar. Kör{" "}
+                <code className="font-mono">get_list_members</code> i Supabase
+                SQL-editorn.
+              </p>
             ) : members.length === 0 ? (
               <p className="text-sm text-gray-400">Inga medlemmar hittades.</p>
             ) : (
