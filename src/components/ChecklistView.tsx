@@ -43,6 +43,7 @@ export default function ChecklistView({
   const [copyLabel, setCopyLabel] = useState("Kopiera");
   const [currentName, setCurrentName] = useState(listName);
   const [editingName, setEditingName] = useState<string | null>(null);
+  const [rtStatus, setRtStatus] = useState<string>("connecting");
 
   useEffect(() => {
     const supabase = createClient();
@@ -81,6 +82,7 @@ export default function ChecklistView({
         },
       )
       .subscribe((status, err) => {
+        setRtStatus(status);
         if (err) console.error("[Realtime] channel error:", err);
       });
 
@@ -186,6 +188,10 @@ export default function ChecklistView({
           Listkompis
         </p>
         <div className="flex items-center gap-3 text-sm flex-shrink-0">
+          <span
+            title={`Realtid: ${rtStatus}`}
+            className={`w-2 h-2 rounded-full flex-shrink-0 ${rtStatus === "SUBSCRIBED" ? "bg-green-400" : rtStatus.includes("ERROR") || rtStatus.includes("CLOSED") ? "bg-red-400" : "bg-yellow-400"}`}
+          />
           <span className="text-gray-400 text-xs truncate max-w-[160px]">
             {userEmail}
           </span>
