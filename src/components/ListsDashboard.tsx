@@ -15,6 +15,7 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
   const [lists, setLists] = useState<ListEntry[]>(initialLists);
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -54,18 +55,44 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
         <p className="text-xs font-semibold tracking-widest text-blue-600 uppercase">
           Listkompis
         </p>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex items-center gap-2 text-sm flex-shrink-0">
           <span className="text-gray-400 text-xs truncate max-w-[160px]">
             {userEmail}
           </span>
           <button
-            onClick={handleSignOut}
-            className="text-gray-500 hover:text-gray-700 underline underline-offset-2"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? "Stäng meny" : "Öppna meny"}
+            aria-expanded={menuOpen}
+            className="p-2 -mr-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            Logga ut
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <circle cx="12" cy="5" r="1.5" />
+              <circle cx="12" cy="12" r="1.5" />
+              <circle cx="12" cy="19" r="1.5" />
+            </svg>
           </button>
         </div>
       </div>
+
+      {/* Expandable menu */}
+      {menuOpen && (
+        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50">
+          <div className="px-4 py-3">
+            <button
+              onClick={handleSignOut}
+              className="text-sm text-red-500 hover:text-red-600"
+            >
+              Logga ut
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mina listor</h1>
       </div>
