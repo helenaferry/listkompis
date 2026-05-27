@@ -424,12 +424,21 @@ export default function ChecklistView({
                     {userId === createdBy &&
                       m.member_id !== createdBy &&
                       (removingMemberId === m.member_id ? (
-                        <div className="flex items-center gap-1.5 flex-shrink-0" role="alert">
-                          <span className="text-xs text-gray-500 dark:text-zinc-400">Ta bort?</span>
+                        <div
+                          className="flex items-center gap-1.5 flex-shrink-0"
+                          role="alert"
+                        >
+                          <span className="text-xs text-gray-500 dark:text-zinc-400">
+                            Ta bort?
+                          </span>
                           <button
                             onClick={async () => {
                               setMembers((prev) =>
-                                prev ? prev.filter((x) => x.member_id !== m.member_id) : prev,
+                                prev
+                                  ? prev.filter(
+                                      (x) => x.member_id !== m.member_id,
+                                    )
+                                  : prev,
                               );
                               setRemovingMemberId(null);
                               await removeListMember(listId, m.member_id);
@@ -451,7 +460,17 @@ export default function ChecklistView({
                           aria-label={`Ta bort ${m.member_email}`}
                           className="flex-shrink-0 text-gray-300 hover:text-red-400 dark:text-zinc-600 dark:hover:text-red-400 transition-colors"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
                             <line x1="18" y1="6" x2="6" y2="18" />
                             <line x1="6" y1="6" x2="18" y2="18" />
                           </svg>
