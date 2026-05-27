@@ -105,7 +105,15 @@ export default function ListsDashboard({ initialLists, userEmail }: Props) {
 
       {/* Expandable menu */}
       {menuOpen && (
-        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50">
+        <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 divide-y divide-gray-200">
+          <div className="px-4 py-3">
+            <a
+              href="/hjalp"
+              className="text-sm text-gray-700 hover:text-gray-900"
+            >
+              Hjälp
+            </a>
+          </div>
           <div className="px-4 py-3">
             <button
               onClick={handleSignOut}
