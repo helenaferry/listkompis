@@ -58,7 +58,13 @@ function LoginForm() {
           });
 
     if (error) {
-      setError(error.message);
+      if (error.message.toLowerCase().includes("rate limit")) {
+        setError(
+          "För många mejl har skickats nyligen. Vänta några minuter och försök igen.",
+        );
+      } else {
+        setError(error.message);
+      }
       setLoading(false);
     } else if (mode === "signup") {
       setSignupSent(true);
