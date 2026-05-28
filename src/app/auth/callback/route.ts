@@ -14,5 +14,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/glomt-losenord?error=expired`);
+  return NextResponse.redirect(`${origin}/login?error=link-expired`);
 }
