@@ -9,6 +9,8 @@ import {
   getListMembers,
   deleteCheckedItems,
   removeListMember,
+  deleteList,
+  leaveList,
 } from "@/app/actions";
 import ChecklistItem from "./ChecklistItem";
 import NewItemRow from "./NewItemRow";
@@ -51,6 +53,7 @@ export default function ChecklistView({
   const [members, setMembers] = useState<ListMember[] | null>(null);
   const [membersError, setMembersError] = useState(false);
   const [clearConfirm, setClearConfirm] = useState(false);
+  const [leaveConfirm, setLeaveConfirm] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const { isDark, toggle: toggleDark } = useDarkMode();
 
@@ -202,6 +205,15 @@ export default function ChecklistView({
   const handleClearChecked = async () => {
     setItems((prev) => prev.filter((i) => !i.is_checked));
     await deleteCheckedItems(listId);
+  };
+
+  const handleLeaveOrDelete = async () => {
+    if (userId === createdBy) {
+      await deleteList(listId);
+    } else {
+      await leaveList(listId);
+    }
+    window.location.href = "/listor";
   };
 
   const handleMenuToggle = async () => {
@@ -479,6 +491,37 @@ export default function ChecklistView({
                   </li>
                 ))}
               </ul>
+            )}
+          </div>
+          <div className="px-4 py-3">
+            {leaveConfirm ? (
+              <div className="flex items-center gap-3" role="alert">
+                <span className="text-sm text-gray-600 dark:text-zinc-400">
+                  Är du säker?
+                </span>
+                <button
+                  onClick={() => {
+                    setLeaveConfirm(false);
+                    handleLeaveOrDelete();
+                  }}
+                  className="text-sm text-red-500 hover:text-red-600 font-medium"
+                >
+                  Ja
+                </button>
+                <button
+                  onClick={() => setLeaveConfirm(false)}
+                  className="text-sm text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                >
+                  Nej
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setLeaveConfirm(true)}
+                className="text-sm text-red-400 hover:text-red-600"
+              >
+                {userId === createdBy ? "Ta bort lista" : "Lämna lista"}
+              </button>
             )}
           </div>
         </div>
