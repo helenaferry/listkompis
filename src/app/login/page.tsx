@@ -77,10 +77,10 @@ function LoginForm() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Listkompis</h1>
-        <p className="text-sm text-gray-500 mb-6">Din delade checklista</p>
+    <main className="min-h-screen bg-gray-50 dark:bg-[#1c1c1e] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 p-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f0ead6] mb-1">Listkompis</h1>
+        <p className="text-sm text-gray-500 dark:text-zinc-400 mb-6">Din delade checklista</p>
 
         {signupSent ? (
           <div className="space-y-4">
@@ -98,7 +98,7 @@ function LoginForm() {
                 setMode("login");
                 setPassword("");
               }}
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
             >
               Tillbaka till inloggning
             </button>
@@ -119,7 +119,7 @@ function LoginForm() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-[#e8e2d6] mb-1"
                 >
                   E-post
                 </label>
@@ -130,14 +130,14 @@ function LoginForm() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 px-4 py-2 text-gray-900 dark:text-[#f0ead6] dark:bg-zinc-800 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-[#e8e2d6] mb-1"
                 >
                   Lösenord
                 </label>
@@ -151,7 +151,7 @@ function LoginForm() {
                   autoComplete={
                     mode === "login" ? "current-password" : "new-password"
                   }
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 px-4 py-2 text-gray-900 dark:text-[#f0ead6] dark:bg-zinc-800 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -182,7 +182,7 @@ function LoginForm() {
                 setMode((m) => (m === "login" ? "signup" : "login"));
                 setError(null);
               }}
-              className="mt-4 text-sm text-blue-600 hover:text-blue-700 w-full text-center"
+              className="mt-4 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 w-full text-center"
             >
               {mode === "login"
                 ? "Inget konto? Skapa ett"
@@ -192,7 +192,7 @@ function LoginForm() {
             {mode === "login" && (
               <Link
                 href="/glomt-losenord"
-                className="mt-2 text-sm text-gray-500 hover:text-gray-700 block text-center"
+                className="mt-2 text-sm text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 block text-center"
               >
                 Glömt lösenordet?
               </Link>
