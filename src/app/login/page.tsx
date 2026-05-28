@@ -16,16 +16,18 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-  const [mode, setMode] = useState<Mode>("login");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const linkExpired = searchParams.get("error") === "link-expired";
+  const [mode, setMode] = useState<Mode>(
+    searchParams.get("signup") === "1" ? "signup" : "login",
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [signupSent, setSignupSent] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const linkExpired = searchParams.get("error") === "link-expired";
 
   // If the user navigates back to this page via bfcache while already logged in,
   // the server-side proxy never runs – catch it here instead.
