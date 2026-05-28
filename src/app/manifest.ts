@@ -7,24 +7,26 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Din delade checklista",
     start_url: "/",
     display: "standalone",
-    background_color: "#f9fafb",
-    theme_color: "#ffffff",
+    background_color: "#2563eb",
+    theme_color: "#2563eb",
     icons: [
-      {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
-        purpose: "maskable",
-      },
       {
         src: "/icon-192.png",
         sizes: "192x192",
         type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icon-maskable.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
       {
         src: "/icon-512.png",
         sizes: "512x512",
         type: "image/png",
+        purpose: "any",
       },
     ],
   };

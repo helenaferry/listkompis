@@ -79,8 +79,12 @@ function LoginForm() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[#1c1c1e] flex items-center justify-center px-4">
       <div className="w-full max-w-sm bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f0ead6] mb-1">Listkompis</h1>
-        <p className="text-sm text-gray-500 dark:text-zinc-400 mb-6">Din delade checklista</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f0ead6] mb-1">
+          Listkompis
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-zinc-400 mb-6">
+          Din delade checklista
+        </p>
 
         {signupSent ? (
           <div className="space-y-4">
