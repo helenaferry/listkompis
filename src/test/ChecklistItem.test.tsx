@@ -121,4 +121,54 @@ describe("ChecklistItem", () => {
     );
     expect(screen.getByText("Köp mjölk")).not.toHaveClass("line-through");
   });
+
+  it("activates edit mode when Enter is pressed on the text", () => {
+    render(
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
+    );
+    fireEvent.keyDown(screen.getByRole("button", { name: /Redigera/ }), {
+      key: "Enter",
+    });
+    expect(
+      screen.getByRole("textbox", { name: "Redigera" }),
+    ).toBeInTheDocument();
+  });
+
+  it("activates edit mode when Space is pressed on the text", () => {
+    render(
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
+    );
+    fireEvent.keyDown(screen.getByRole("button", { name: /Redigera/ }), {
+      key: " ",
+    });
+    expect(
+      screen.getByRole("textbox", { name: "Redigera" }),
+    ).toBeInTheDocument();
+  });
+
+  it("cancels edit and restores text when Escape is pressed", () => {
+    render(
+      <ChecklistItem
+        item={mockItem}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        hideMode="strike"
+      />,
+    );
+    fireEvent.click(screen.getByText("Köp mjölk"));
+    const input = screen.getByRole("textbox", { name: "Redigera" });
+    fireEvent.change(input, { target: { value: "Något annat" } });
+    fireEvent.keyDown(input, { key: "Escape" });
+    expect(screen.getByText("Köp mjölk")).toBeInTheDocument();
+  });
 });

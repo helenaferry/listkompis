@@ -48,9 +48,10 @@ export default async function HjalpPage() {
             Byta namn på en lista
           </h2>
           <p className="text-sm leading-relaxed">
-            På startsidan: klicka på pennikonen till höger om listnamnet. Inne i
-            en lista: klicka direkt på listnamnet. Tryck Enter eller klicka
-            utanför för att spara, Escape för att avbryta.
+            På startsidan: öppna ⋮-menyn till höger om listnamnet och välj{" "}
+            <strong>Byt namn</strong>. Inne i en lista: klicka direkt på
+            listnamnet. Tryck Enter eller klicka utanför för att spara, Escape
+            för att avbryta.
           </p>
         </section>
 
@@ -71,8 +72,8 @@ export default async function HjalpPage() {
           </h2>
           <p className="text-sm leading-relaxed">
             Skriv i fältet högst upp i listan och tryck Enter för att lägga
-            till. Klicka på ett objekt för att bocka av eller bocka i det. Håll
-            in på ett objekt för att redigera texten.
+            till. Klicka på ett objekts kryssruta för att bocka av eller bocka i
+            det. Klicka på texten för att redigera den.
           </p>
         </section>
 
@@ -116,7 +117,31 @@ export default async function HjalpPage() {
           <p className="text-sm leading-relaxed">
             Öppna menyn (⋮) inne i en lista och scrolla ned till{" "}
             <strong>Tillgång</strong>. Där visas e-postadresserna till alla som
-            är med i listan.
+            är med i listan. Listägaren kan ta bort en annan persons åtkomst
+            genom att klicka på ×-ikonen bredvid deras namn.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-gray-900 mb-2">
+            Ta bort eller lämna en lista
+          </h2>
+          <p className="text-sm leading-relaxed">
+            Öppna ⋮-menyn på startsidan eller inne i listan. Listägaren ser{" "}
+            <strong>Ta bort lista</strong> — det tar bort listan och allt
+            innehåll permanent för alla. Övriga medlemmar ser{" "}
+            <strong>Lämna lista</strong> — det tar bara bort din egen åtkomst.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-gray-900 mb-2">
+            Mörkt läge
+          </h2>
+          <p className="text-sm leading-relaxed">
+            Appen följer automatiskt din enhets ljust/mörkt-inställning. Du kan
+            också byta manuellt via ⋮-menyn — välj <strong>Mörkt läge</strong>{" "}
+            eller <strong>Ljust läge</strong>. Inställningen sparas per enhet.
           </p>
         </section>
 
