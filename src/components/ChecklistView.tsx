@@ -60,7 +60,6 @@ export default function ChecklistView({
 
   const showSaveError = () => {
     setSaveFailed(true);
-    setTimeout(() => setSaveFailed(false), 4000);
   };
 
   useEffect(() => {
@@ -598,13 +597,20 @@ export default function ChecklistView({
         </div>
       )}
 
-      {/* Save error toast */}
+      {/* Save error banner */}
       {saveFailed && (
         <div
           role="alert"
-          className="mb-3 rounded-lg bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-300"
+          className="mb-3 rounded-lg bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-300 flex items-center justify-between gap-3"
         >
-          Sparandet misslyckades – kontrollera uppkopplingen.
+          <span>Sparandet misslyckades – kontrollera uppkopplingen.</span>
+          <button
+            onClick={() => setSaveFailed(false)}
+            aria-label="Stäng felmeddelande"
+            className="flex-shrink-0 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-200 text-lg leading-none"
+          >
+            &times;
+          </button>
         </div>
       )}
 
