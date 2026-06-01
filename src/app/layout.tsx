@@ -19,6 +19,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Listkompis",
   description: "Din delade checklista",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
@@ -45,7 +46,7 @@ export default function RootLayout({
         {/* Runs synchronously before paint to avoid flash */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('listkompis_theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(t!=='light'&&d)){document.documentElement.classList.add('dark');}else if(t==='light'){document.documentElement.classList.add('light');}if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}})();`,
+            __html: `(function(){var t=localStorage.getItem('listkompis_theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(t!=='light'&&d)){document.documentElement.classList.add('dark');}else if(t==='light'){document.documentElement.classList.add('light');}var isFirefox=/Firefox\//.test(navigator.userAgent);if('serviceWorker' in navigator){if(isFirefox){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(reg){reg.unregister();});});}else{window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}}})();`,
           }}
         />
       </head>
