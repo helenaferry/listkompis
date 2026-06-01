@@ -209,8 +209,12 @@ export default function ChecklistView({
       setInviteUrl(null);
       return;
     }
-    const token = await getOrCreateInvite(listId);
-    setInviteUrl(`${window.location.origin}/bjud-in/${token}`);
+    try {
+      const token = await getOrCreateInvite(listId);
+      setInviteUrl(`${window.location.origin}/bjud-in/${token}`);
+    } catch {
+      showSaveError();
+    }
   };
 
   const handleCopy = async () => {
@@ -232,23 +236,40 @@ export default function ChecklistView({
       setEditingName(null);
       return;
     }
+    const previous = currentName;
     setCurrentName(trimmed);
     setEditingName(null);
-    await renameList(listId, trimmed);
+    try {
+      await renameList(listId, trimmed);
+    } catch {
+      setCurrentName(previous);
+      showSaveError();
+    }
   };
 
   const handleClearChecked = async () => {
+    const removed = items.filter((i) => i.is_checked);
     setItems((prev) => prev.filter((i) => !i.is_checked));
-    await deleteCheckedItems(listId);
+    try {
+      await deleteCheckedItems(listId);
+    } catch {
+      setItems((prev) => [...removed, ...prev]);
+      showSaveError();
+    }
   };
 
   const handleLeaveOrDelete = async () => {
-    if (userId === createdBy) {
-      await deleteList(listId);
-    } else {
-      await leaveList(listId);
+    try {
+      if (userId === createdBy) {
+        await deleteList(listId);
+      } else {
+        await leaveList(listId);
+      }
+      window.location.href = "/listor";
+    } catch {
+      setLeaveConfirm(false);
+      showSaveError();
     }
-    window.location.href = "/listor";
   };
 
   const handleMenuToggle = async () => {
@@ -483,6 +504,9 @@ export default function ChecklistView({
                           </span>
                           <button
                             onClick={async () => {
+                              const removed = members?.find(
+                                (x) => x.member_id === m.member_id,
+                              );
                               setMembers((prev) =>
                                 prev
                                   ? prev.filter(
@@ -491,7 +515,16 @@ export default function ChecklistView({
                                   : prev,
                               );
                               setRemovingMemberId(null);
-                              await removeListMember(listId, m.member_id);
+                              try {
+                                await removeListMember(listId, m.member_id);
+                              } catch {
+                                if (removed) {
+                                  setMembers((prev) =>
+                                    prev ? [...prev, removed] : [removed],
+                                  );
+                                }
+                                showSaveError();
+                              }
                             }}
                             className="text-xs text-red-500 hover:text-red-600 font-medium"
                           >
