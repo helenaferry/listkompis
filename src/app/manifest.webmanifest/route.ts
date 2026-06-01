@@ -1,14 +1,17 @@
-import type { MetadataRoute } from "next";
+import { NextResponse } from "next/server";
 
-export default function manifest(): MetadataRoute.Manifest {
-  return {
+export function GET(req: Request) {
+  const ua = req.headers.get("user-agent") ?? "";
+  const isFirefox = /Firefox\//.test(ua);
+
+  const manifest = {
     id: "/",
     name: "Listkompis",
     short_name: "Listkompis",
     description: "Din delade checklista",
     start_url: "/",
     scope: "/",
-    display: "standalone",
+    display: isFirefox ? "browser" : "standalone",
     background_color: "#2563eb",
     theme_color: "#2563eb",
     icons: [
@@ -38,4 +41,11 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
   };
+
+  return new NextResponse(JSON.stringify(manifest), {
+    headers: {
+      "Content-Type": "application/manifest+json",
+      "Cache-Control": "no-store",
+    },
+  });
 }
