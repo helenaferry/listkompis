@@ -6,11 +6,14 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Listkompis",
     short_name: "Listkompis",
     description: "Din delade checklista",
-    start_url: "/login",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#2563eb",
     theme_color: "#2563eb",
+    launch_handler: {
+      client_mode: "focus-existing",
+    },
     icons: [
       {
         src: "/icon-192.png",
@@ -37,5 +40,5 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "any",
       },
     ],
-  };
+  } as MetadataRoute.Manifest;
 }
