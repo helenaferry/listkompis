@@ -1,14 +1,7 @@
-import nextPwa from "next-pwa";
+import type { NextConfig } from "next";
 
-const withPWA = nextPwa({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-});
-
-const nextConfig = {
-  reactStrictMode: true,
-  turbopack: {}, // <- tystar Next 16 error
+const nextConfig: NextConfig = {
+  /* config options here */
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;
