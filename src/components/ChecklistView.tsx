@@ -245,11 +245,14 @@ export default function ChecklistView({
           Listkompis
         </a>
         <div className="flex items-center gap-3 text-sm flex-shrink-0">
-          <span
-            title={`Realtid: ${rtStatus}`}
-            aria-hidden="true"
-            className={`w-2 h-2 rounded-full flex-shrink-0 ${rtStatus === "SUBSCRIBED" ? "bg-green-400" : rtStatus.includes("ERROR") || rtStatus.includes("CLOSED") ? "bg-red-400" : "bg-yellow-400"}`}
-          />
+          {(rtStatus.includes("ERROR") || rtStatus.includes("CLOSED")) && (
+            <span
+              title={`Realtidssynk: ${rtStatus}`}
+              aria-label="Realtidsanslutning bruten"
+              role="img"
+              className="w-2 h-2 rounded-full flex-shrink-0 bg-red-400"
+            />
+          )}
           <span className="text-gray-400 text-xs truncate max-w-[160px] dark:text-zinc-500">
             {userEmail}
           </span>
