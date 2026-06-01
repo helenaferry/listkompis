@@ -2,10 +2,12 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: "/",
     name: "Listkompis",
     short_name: "Listkompis",
     description: "Din delade checklista",
-    start_url: "/",
+    start_url: "/login",
+    scope: "/",
     display: "standalone",
     background_color: "#2563eb",
     theme_color: "#2563eb",
