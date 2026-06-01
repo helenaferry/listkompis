@@ -25,7 +25,7 @@ export default function Loading() {
             <div className="w-5 h-5 bg-gray-200 dark:bg-zinc-700 rounded flex-shrink-0" />
             <div
               className="h-4 bg-gray-200 dark:bg-zinc-700 rounded"
-              style={{ width: `${55 + (i * 13) % 35}%` }}
+              style={{ width: `${55 + ((i * 13) % 35)}%` }}
             />
           </div>
         ))}

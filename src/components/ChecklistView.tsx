@@ -55,7 +55,13 @@ export default function ChecklistView({
   const [clearConfirm, setClearConfirm] = useState(false);
   const [leaveConfirm, setLeaveConfirm] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
+  const [saveFailed, setSaveFailed] = useState(false);
   const { isDark, toggle: toggleDark } = useDarkMode();
+
+  const showSaveError = () => {
+    setSaveFailed(true);
+    setTimeout(() => setSaveFailed(false), 4000);
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem(
@@ -133,12 +139,40 @@ export default function ChecklistView({
       ),
     );
     const supabase = createClient();
-    await supabase.from("items").update({ is_checked: checked }).eq("id", id);
+    const { error } = await supabase
+      .from("items")
+      .update({ is_checked: checked })
+      .eq("id", id);
+    if (error) {
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, is_checked: !checked } : item,
+        ),
+      );
+      showSaveError();
+    }
   };
 
   const handleEdit = async (id: string, text: string) => {
+    const original = items.find((i) => i.id === id)?.text;
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, text } : item)),
+    );
     const supabase = createClient();
-    await supabase.from("items").update({ text }).eq("id", id);
+    const { error } = await supabase
+      .from("items")
+      .update({ text })
+      .eq("id", id);
+    if (error) {
+      if (original !== undefined) {
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, text: original } : item,
+          ),
+        );
+      }
+      showSaveError();
+    }
   };
 
   const handleAdd = async (text: string) => {
@@ -162,6 +196,7 @@ export default function ChecklistView({
 
     if (error) {
       setItems((prev) => prev.filter((i) => i.id !== tempId));
+      showSaveError();
     } else if (newItem) {
       setItems((prev) =>
         prev.map((i) => (i.id === tempId ? (newItem as Item) : i)),
@@ -527,6 +562,16 @@ export default function ChecklistView({
               </button>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Save error toast */}
+      {saveFailed && (
+        <div
+          role="alert"
+          className="mb-3 rounded-lg bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-300"
+        >
+          Sparandet misslyckades – kontrollera uppkopplingen.
         </div>
       )}
 
