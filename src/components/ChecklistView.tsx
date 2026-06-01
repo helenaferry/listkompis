@@ -371,6 +371,20 @@ export default function ChecklistView({
         <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 divide-y divide-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
           <div className="px-4 py-3">
             <button
+              onClick={() =>
+                setHideMode((m) => {
+                  const next = m === "strike" ? "hide" : "strike";
+                  localStorage.setItem("listkompis_hideMode", next);
+                  return next;
+                })
+              }
+              className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
+            >
+              {hideMode === "hide" ? "Visa avbockade" : "Dölj avbockade"}
+            </button>
+          </div>
+          <div className="px-4 py-3">
+            <button
               onClick={toggleDark}
               className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
             >
@@ -384,20 +398,6 @@ export default function ChecklistView({
             >
               Hjälp
             </a>
-          </div>
-          <div className="px-4 py-3">
-            <button
-              onClick={() =>
-                setHideMode((m) => {
-                  const next = m === "strike" ? "hide" : "strike";
-                  localStorage.setItem("listkompis_hideMode", next);
-                  return next;
-                })
-              }
-              className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
-            >
-              {hideMode === "hide" ? "Visa avbockade" : "Dölj avbockade"}
-            </button>
           </div>
           {items.some((i) => i.is_checked) && (
             <div className="px-4 py-3">
