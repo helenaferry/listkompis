@@ -7,11 +7,11 @@ const isDevMode =
 
 function isPublicAsset(pathname: string) {
   return (
-    pathname.endsWith("manifest.webmanifest") ||
+    pathname === "/manifest.webmanifest" ||
     pathname === "/sw.js" ||
-    pathname.endsWith("sw.js") ||
     pathname.startsWith("/icon") ||
-    pathname === "/favicon.ico"
+    pathname === "/favicon.ico" ||
+    pathname === "/apple-touch-icon.png"
   );
 }
 
