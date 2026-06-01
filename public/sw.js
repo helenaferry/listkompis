@@ -1,5 +1,5 @@
 // Service worker – PWA standalone mode + static asset caching
-const STATIC_CACHE = "listkompis-static-v1";
+const STATIC_CACHE = "listkompis-static-v2";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
@@ -29,23 +29,5 @@ self.addEventListener("fetch", (e) => {
         return response;
       }),
     );
-    return;
   }
-
-  // Network-first for everything else (pages, API, Supabase)
-  e.respondWith(
-    fetch(e.request).catch(() => {
-      if (e.request.mode === "navigate") {
-        return new Response(
-          '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Listkompis</title></head><body style="font-family:Arial,Helvetica,sans-serif;padding:1rem">Ingen uppkoppling just nu. Prova igen om en stund.</body></html>',
-          {
-            headers: {
-              "Content-Type": "text/html; charset=utf-8",
-            },
-          },
-        );
-      }
-      throw new Error("Network request failed");
-    }),
-  );
 });
