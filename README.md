@@ -45,6 +45,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 
 > **Obs:** Supabase har nyligen bytt nyckelformat. Använd den **legacy anon-nyckeln** (börjar med `eyJ`) som finns under **Settings → API → Legacy API keys**.
 
+**Befintligt projekt:** Om du redan har kört schemat tidigare behöver du bara köra de nya delarna i SQL Editor: kolumnen `position` på `items`, funktionen `set_item_order` och `NOTIFY pgrst, 'reload schema';`. Kolumnen `is_starred` behöver också finnas.
+
 ### 4. Starta dev-servern
 
 ```bash
@@ -71,6 +73,8 @@ npm run dev
 3. Lägg till miljövariablerna `NEXT_PUBLIC_SUPABASE_URL` och `NEXT_PUBLIC_SUPABASE_ANON_KEY` under **Settings → Environment Variables**.
 4. Klicka **Deploy** – klart!
 
+> **Viktigt:** Saknas `NEXT_PUBLIC_SUPABASE_URL` i deployen körs appen i dev-läge utan inloggning. Kontrollera att båda variablerna är satta, och att `NEXT_PUBLIC_DEV_MODE` inte finns, innan du delar länken.
+
 ## Databasstruktur
 
 ```
@@ -78,6 +82,7 @@ lists
   id          uuid  (PK)
   name        text
   created_at  timestamptz
+  created_by  uuid → auth.users
 
 list_members
   list_id     uuid → lists
@@ -90,6 +95,8 @@ items
   list_id     uuid → lists
   text        text
   is_checked  boolean
+  is_starred  boolean
+  position    integer   (manuell ordning inom gruppen, lägre = högre upp)
   created_at  timestamptz
   created_by  uuid → auth.users
 
@@ -97,7 +104,8 @@ list_invites
   id          uuid  (PK)
   list_id     uuid → lists
   token       text  (unik inbjudningslänk)
+  created_by  uuid → auth.users
   created_at  timestamptz
 ```
 
-Row Level Security är aktiverat: alla som är medlemmar i en lista kan läsa, lägga till och bocka av i den listan.
+Row Level Security är aktiverat: alla som är medlemmar i en lista kan läsa, lägga till och ändra saker i den listan. Ändringar omfattar att bocka av, stjärnmärka, redigera och sortera. Att rensa avbockade saker och att ändra ordningen sker via funktioner som kontrollerar medlemskapet.

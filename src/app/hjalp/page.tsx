@@ -68,12 +68,14 @@ export default async function HjalpPage() {
 
         <section>
           <h2 className="text-base font-semibold text-gray-900 mb-2">
-            Lägga till och bocka av saker
+            Lägga till, stjärnmärka och bocka av saker
           </h2>
           <p className="text-sm leading-relaxed">
             Skriv i fältet högst upp i listan och tryck Enter för att lägga
-            till. Klicka på ett objekts kryssruta för att bocka av eller bocka i
-            det. Klicka på texten för att redigera den.
+            till. Nya saker läggs överst i sin grupp. Klicka på stjärnan för att markera något som extra viktigt,
+            eller använd stjärnan i ny-saksfältet för att skapa det direkt som
+            stjärnmärkt. Klicka på ett objekts kryssruta för att bocka av eller
+            bocka i det. Klicka på texten för att redigera den.
           </p>
         </section>
 
@@ -106,7 +108,8 @@ export default async function HjalpPage() {
           <p className="text-sm leading-relaxed">
             Öppna menyn (⋮) inne i en lista och välj <strong>Bjud in</strong>.
             Kopiera länken och skicka den till den du vill dela listan med. Den
-            som öppnar länken och loggar in får direkt tillgång till listan.
+            som öppnar länken, loggar in och klickar på{" "}
+            <strong>Gå med i listan</strong> får tillgång till listan.
           </p>
         </section>
 
@@ -152,6 +155,32 @@ export default async function HjalpPage() {
           <p className="text-sm leading-relaxed">
             Ändringar som du eller en medredigerare gör syns direkt hos alla som
             har listan öppen, utan att behöva ladda om sidan.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-gray-900 mb-2">
+            Tappad uppkoppling
+          </h2>
+          <p className="text-sm leading-relaxed">
+            Om uppkopplingen tappas, till exempel i en butik, sparas dina
+            ändringar på enheten och skickas automatiskt när anslutningen är
+            tillbaka. Medan ändringar väntar visas en påminnelse i listan. När
+            du kommer tillbaka till appen hämtas listan på nytt.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-gray-900 mb-2">
+            Sortera saker i listan
+          </h2>
+          <p className="text-sm leading-relaxed">
+            Dra en sak upp eller ner för att ändra ordningen. På mobil håller du
+            fingret på saken en kort stund innan du drar. Med tangentbordet
+            väljer du en sak och håller ned <strong>Alt</strong> (Windows) eller{" "}
+            <strong>Option</strong> (Mac) medan du trycker på <strong>pil upp</strong>{" "}
+            eller <strong>pil ner</strong>. Stjärnmärkta saker sorteras för sig,
+            överst. Ordningen delas med alla i listan.
           </p>
         </section>
 
