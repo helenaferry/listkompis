@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ListsDashboard from "@/components/ListsDashboard";
 import DevListsDashboard from "@/components/DevListsDashboard";
+import Greeting from "@/components/Greeting";
+import { DEV_USER } from "@/lib/localListStore";
 import type { ListEntry } from "@/lib/types";
 
 const isDevMode =
@@ -13,6 +15,7 @@ export default async function ListsPage() {
     return (
       <main className="min-h-screen bg-gray-50">
         <DevListsDashboard />
+        <Greeting email={DEV_USER.email} />
       </main>
     );
   }
@@ -66,6 +69,11 @@ export default async function ListsPage() {
         userEmail={user.email ?? ""}
         userId={user.id}
       />
+      {user.email?.toLowerCase() === "jonas.ferry@gmail.com" ? (
+        <Greeting />
+      ) : (
+        <Greeting email={user.email ?? ""} />
+      )}
     </main>
   );
 }
