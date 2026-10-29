@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useDarkMode } from "@/lib/useDarkMode";
 import type { Item } from "@/lib/types";
@@ -59,41 +59,43 @@ export default function ChecklistScreen({
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const [saveFailed, setSaveFailed] = useState(false);
   const [pending, setPending] = useState(0);
-  const [showPending, setShowPending] = useState(false);
+  const [delayPassed, setDelayPassed] = useState(false);
+  const showPending = pending > 0 && delayPassed;
   const { isDark, toggle: toggleDark } = useDarkMode();
 
   const showSaveError = () => {
     setSaveFailed(true);
   };
 
-  // Fetches the list from the server again and keeps changes that are still waiting
-  const resync = async () => {
+  // Fetches the list from the server again and keeps changes that are still waiting.
+  // Without a connection, the waiting changes are shown on top of what is already there.
+  const resync = useCallback(async () => {
     try {
       setItems(applyPending(await store.loadItems(listId), listId));
     } catch {
-      // No connection: keep what is shown
+      setItems((prev) => applyPending(prev, listId));
     }
-  };
+  }, [store, listId]);
 
-  const flush = async () => {
+  const flush = useCallback(async () => {
     await flushOutbox(store, () => {
-      showSaveError();
+      setSaveFailed(true);
       void resync();
     });
     setPending(pendingCount());
-  };
+  }, [store, resync]);
 
   // Show the notice only if changes are still waiting after the delay
   useEffect(() => {
-    if (pending === 0) {
-      setShowPending(false);
-      return;
-    }
+    if (pending === 0) return;
     const timer = window.setTimeout(
-      () => setShowPending(true),
+      () => setDelayPassed(true),
       PENDING_NOTICE_DELAY_MS,
     );
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      setDelayPassed(false);
+    };
   }, [pending]);
 
   const saveChange = (body: OpBody) => {
@@ -131,7 +133,7 @@ export default function ChecklistScreen({
         }
       },
     });
-  }, [store, listId]);
+  }, [store, listId, resync]);
 
   useEffect(() => {
     const syncNow = () => {
@@ -142,7 +144,6 @@ export default function ChecklistScreen({
       if (document.visibilityState === "visible") syncNow();
     };
 
-    setItems((prev) => applyPending(prev, listId));
     syncNow();
     window.addEventListener("online", syncNow);
     document.addEventListener("visibilitychange", onVisible);
@@ -152,7 +153,7 @@ export default function ChecklistScreen({
       document.removeEventListener("visibilitychange", onVisible);
       window.clearInterval(timer);
     };
-  }, [store, listId]);
+  }, [resync, flush]);
 
   const handleToggle = async (id: string, checked: boolean) => {
     setItems((prev) =>

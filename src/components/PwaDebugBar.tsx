@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 type DebugState = {
-  enabled: boolean;
   browser: string;
   displayMode: "standalone" | "browser";
   swController: "yes" | "no";
@@ -12,41 +11,42 @@ type DebugState = {
   manifestStartUrl: string;
 };
 
+const subscribe = () => () => {};
+
+// The bar is only shown with ?debugPwa=1. Nothing is rendered on the server or during hydration.
 export default function PwaDebugBar() {
-  const [state, setState] = useState<DebugState>({
-    enabled: false,
-    browser: "unknown",
-    displayMode: "browser",
-    swController: "no",
-    swRegistrations: "n/a",
-    manifestDisplay: "unknown",
-    manifestStartUrl: "unknown",
-  });
+  const enabled = useSyncExternalStore(
+    subscribe,
+    () => new URLSearchParams(window.location.search).get("debugPwa") === "1",
+    () => false,
+  );
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const enabled = params.get("debugPwa") === "1";
-    if (!enabled) return;
+  if (!enabled) return null;
+  return <PwaDebugDetails />;
+}
 
-    const ua = navigator.userAgent;
-    const browser = /Firefox\//.test(ua)
+function readBrowserInfo(): DebugState {
+  const ua = navigator.userAgent;
+  return {
+    browser: /Firefox\//.test(ua)
       ? "Firefox"
       : /Chrome\//.test(ua)
         ? "Chrome"
-        : "Other";
-    const displayMode = window.matchMedia("(display-mode: standalone)").matches
+        : "Other",
+    displayMode: window.matchMedia("(display-mode: standalone)").matches
       ? "standalone"
-      : "browser";
-    const swController = navigator.serviceWorker?.controller ? "yes" : "no";
+      : "browser",
+    swController: navigator.serviceWorker?.controller ? "yes" : "no",
+    swRegistrations: "n/a",
+    manifestDisplay: "unknown",
+    manifestStartUrl: "unknown",
+  };
+}
 
-    setState((prev) => ({
-      ...prev,
-      enabled,
-      browser,
-      displayMode,
-      swController,
-    }));
+function PwaDebugDetails() {
+  const [state, setState] = useState<DebugState>(() => readBrowserInfo());
 
+  useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then((regs) => {
         setState((prev) => ({ ...prev, swRegistrations: regs.length }));
@@ -76,8 +76,6 @@ export default function PwaDebugBar() {
         }));
       });
   }, []);
-
-  if (!state.enabled) return null;
 
   return (
     <div

@@ -18,7 +18,7 @@ export default async function ListPage({
   if (isDevMode) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <DevChecklistView listId={id} />
+        <DevChecklistView key={id} listId={id} />
       </main>
     );
   }

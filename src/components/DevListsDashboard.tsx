@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LinkPendingIndicator from "./LinkPendingIndicator";
+import { useIsMounted } from "@/lib/useIsMounted";
 import type { ListEntry } from "@/lib/types";
 
 const LISTS_KEY = "listkompis_lists";
@@ -22,13 +23,10 @@ function saveLists(lists: ListEntry[]) {
 }
 
 export default function DevListsDashboard() {
-  const [lists, setLists] = useState<ListEntry[]>([]);
+  const mounted = useIsMounted();
+  const [lists, setLists] = useState<ListEntry[]>(() => loadLists());
   const [newName, setNewName] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    setLists(loadLists());
-  }, []);
 
   const updateLists = (next: ListEntry[]) => {
     setLists(next);
@@ -60,6 +58,11 @@ export default function DevListsDashboard() {
       updateLists(lists.map((l) => ({ ...l, is_favorite: l.id === listId })));
     }
   };
+
+  // Nothing from localStorage is shown until the browser has taken over
+  if (!mounted) {
+    return <div className="max-w-lg mx-auto px-4 py-8" aria-busy="true" />;
+  }
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8">

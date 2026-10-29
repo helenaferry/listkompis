@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   DEV_USER,
   loadLocalItems,
   loadLocalListName,
   localListStore,
 } from "@/lib/localListStore";
+import { useIsMounted } from "@/lib/useIsMounted";
 import type { Item } from "@/lib/types";
 import ChecklistScreen from "./ChecklistScreen";
 
@@ -16,17 +17,11 @@ interface Props {
 
 // Same screen as production, with data kept in localStorage instead of Supabase
 export default function DevChecklistView({ listId }: Props) {
-  const [ready, setReady] = useState(false);
-  const [listName, setListName] = useState("Lista");
-  const [items, setItems] = useState<Item[]>([]);
+  const mounted = useIsMounted();
+  const [listName] = useState(() => loadLocalListName(listId));
+  const [items] = useState<Item[]>(() => loadLocalItems(listId));
 
-  useEffect(() => {
-    setItems(loadLocalItems(listId));
-    setListName(loadLocalListName(listId));
-    setReady(true);
-  }, [listId]);
-
-  if (!ready) {
+  if (!mounted) {
     return (
       <div
         className="max-w-lg mx-auto px-4 pt-4 pb-8 animate-pulse"
