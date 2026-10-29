@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import LinkPendingIndicator from "./LinkPendingIndicator";
 import { createClient } from "@/lib/supabase/client";
 import { useDarkMode } from "@/lib/useDarkMode";
 import {
@@ -141,12 +143,12 @@ export default function ListsDashboard({
             </button>
           </div>
           <div className="px-4 py-3">
-            <a
+            <Link
               href="/hjalp"
               className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
             >
               Hjälp
-            </a>
+            </Link>
           </div>
           <div className="px-4 py-3">
             <button
@@ -233,12 +235,13 @@ export default function ListsDashboard({
                   className="flex-1 bg-transparent border-b-2 border-blue-500 outline-none text-gray-800 font-medium min-w-0 dark:text-[#f0ead6]"
                 />
               ) : (
-                <a
+                <Link
                   href={`/lista/${list.id}`}
                   className="flex-1 text-gray-800 font-medium hover:text-blue-600 truncate dark:text-[#e8e2d6] dark:hover:text-blue-400"
                 >
                   {list.name}
-                </a>
+                  <LinkPendingIndicator />
+                </Link>
               )}
               <button
                 onClick={() => {

@@ -26,7 +26,16 @@ export default function DevChecklistView({ listId }: Props) {
     setReady(true);
   }, [listId]);
 
-  if (!ready) return null;
+  if (!ready) {
+    return (
+      <div
+        className="max-w-lg mx-auto px-4 pt-4 pb-8 animate-pulse"
+        aria-busy="true"
+      >
+        <div className="h-6 w-48 rounded bg-gray-200 dark:bg-zinc-700" />
+      </div>
+    );
+  }
 
   return (
     <>

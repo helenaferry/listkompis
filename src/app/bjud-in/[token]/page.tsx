@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { joinListWithToken } from "@/app/actions";
 
@@ -77,18 +78,18 @@ export default async function InvitePage({
                 Logga in eller skapa ett konto för att gå med i listan.
               </p>
               <div className="space-y-3">
-                <a
+                <Link
                   href={`/login?next=/bjud-in/${token}&signup=1`}
                   className="block w-full rounded-lg bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 transition-colors text-center"
                 >
                   Skapa konto
-                </a>
-                <a
+                </Link>
+                <Link
                   href={`/login?next=/bjud-in/${token}`}
                   className="block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-700 font-medium hover:bg-gray-50 transition-colors text-center"
                 >
                   Logga in
-                </a>
+                </Link>
               </div>
             </>
           )}
@@ -108,12 +109,12 @@ export default async function InvitePage({
           <p className="text-gray-500">
             Den här inbjudningslänken är inte giltig.
           </p>
-          <a
+          <Link
             href="/listor"
             className="mt-4 inline-block text-blue-600 hover:text-blue-700"
           >
             Gå till dina listor
-          </a>
+          </Link>
         </div>
       </main>
     );
@@ -146,12 +147,12 @@ export default async function InvitePage({
             Gå med i listan
           </button>
         </form>
-        <a
+        <Link
           href="/listor"
           className="mt-3 block text-sm text-gray-500 hover:text-gray-700"
         >
           Avbryt
-        </a>
+        </Link>
       </div>
     </main>
   );

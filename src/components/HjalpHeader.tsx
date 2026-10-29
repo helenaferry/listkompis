@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useDarkMode } from "@/lib/useDarkMode";
 
@@ -21,12 +22,12 @@ export default function HjalpHeader({ userEmail }: Props) {
   return (
     <div className="mb-3">
       <div className="flex items-center justify-between">
-        <a
+        <Link
           href="/listor"
           className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 pr-4 dark:text-blue-400"
         >
           Listkompis
-        </a>
+        </Link>
         {userEmail && (
           <div className="flex items-center gap-2 text-sm flex-shrink-0">
             <span className="text-gray-400 text-xs truncate max-w-[160px] dark:text-zinc-500">

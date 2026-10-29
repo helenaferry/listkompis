@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useDarkMode } from "@/lib/useDarkMode";
 import type { Item } from "@/lib/types";
 import type { ListMember, ListStore } from "@/lib/listStore";
@@ -301,13 +302,13 @@ export default function ChecklistScreen({
     <div className="max-w-lg mx-auto px-4 pt-4 pb-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <a
+        <Link
           href="/listor"
           className="text-xs font-semibold tracking-widest text-blue-600 uppercase py-2 pr-4 dark:text-blue-400"
           aria-label="Mina listor"
         >
           Listkompis
-        </a>
+        </Link>
         <div className="flex items-center gap-3 text-sm flex-shrink-0">
           {(rtStatus.includes("ERROR") || rtStatus.includes("CLOSED")) && (
             <span

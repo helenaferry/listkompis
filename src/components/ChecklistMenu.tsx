@@ -1,4 +1,5 @@
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import Link from "next/link";
 import type { HideMode } from "./ChecklistListContent";
 
 interface ChecklistMenuProps {
@@ -47,12 +48,12 @@ export default function ChecklistMenu({
         </button>
       </div>
       <div className="px-4 py-3">
-        <a
+        <Link
           href="/hjalp"
           className="text-sm text-gray-700 hover:text-gray-900 dark:text-[#d0ccc4] dark:hover:text-[#f0ead6]"
         >
           Hjälp
-        </a>
+        </Link>
       </div>
       {onSignOut && (
         <div className="px-4 py-3">

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import LinkPendingIndicator from "./LinkPendingIndicator";
 import type { ListEntry } from "@/lib/types";
 
 const LISTS_KEY = "listkompis_lists";
@@ -108,12 +110,13 @@ export default function DevListsDashboard() {
             >
               {list.is_favorite ? "⭐" : "☆"}
             </button>
-            <a
+            <Link
               href={`/lista/${list.id}`}
               className="flex-1 text-gray-800 font-medium hover:text-blue-600 truncate"
             >
               {list.name}
-            </a>
+              <LinkPendingIndicator />
+            </Link>
           </li>
         ))}
         {lists.length === 0 && (
