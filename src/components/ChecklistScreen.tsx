@@ -8,11 +8,15 @@ import { sortItems } from "@/lib/sortItems";
 import {
   applyPending,
   enqueue,
+  pendingCount,
   flushOutbox,
   type OpBody,
 } from "@/lib/outbox";
 import ChecklistListContent, { type HideMode } from "./ChecklistListContent";
 import ChecklistMenu from "./ChecklistMenu";
+
+// Changes usually reach the server in well under this, so the notice is only shown when they are slow
+const PENDING_NOTICE_DELAY_MS = 2000;
 
 interface Props {
   store: ListStore;
@@ -54,6 +58,7 @@ export default function ChecklistScreen({
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const [saveFailed, setSaveFailed] = useState(false);
   const [pending, setPending] = useState(0);
+  const [showPending, setShowPending] = useState(false);
   const { isDark, toggle: toggleDark } = useDarkMode();
 
   const showSaveError = () => {
@@ -70,16 +75,29 @@ export default function ChecklistScreen({
   };
 
   const flush = async () => {
-    setPending(
-      await flushOutbox(store, () => {
-        showSaveError();
-        void resync();
-      }),
-    );
+    await flushOutbox(store, () => {
+      showSaveError();
+      void resync();
+    });
+    setPending(pendingCount());
   };
 
+  // Show the notice only if changes are still waiting after the delay
+  useEffect(() => {
+    if (pending === 0) {
+      setShowPending(false);
+      return;
+    }
+    const timer = window.setTimeout(
+      () => setShowPending(true),
+      PENDING_NOTICE_DELAY_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, [pending]);
+
   const saveChange = (body: OpBody) => {
-    setPending(enqueue(body));
+    enqueue(body);
+    setPending(pendingCount());
     return flush();
   };
 
@@ -357,7 +375,7 @@ export default function ChecklistScreen({
         </button>
       </div>
 
-      {pending > 0 && (
+      {showPending && (
         <p
           role="status"
           className="mb-3 text-sm text-amber-700 dark:text-amber-300"

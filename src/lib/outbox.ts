@@ -60,11 +60,15 @@ export function applyPending(items: Item[], listId: string): Item[] {
   );
 }
 
-export function enqueue(body: OpBody): number {
+export function enqueue(body: OpBody) {
   const ops = read();
   ops.push({ id: crypto.randomUUID(), attempts: 0, body });
   write(ops);
-  return ops.length;
+}
+
+// Read when needed, not when a flush started: a flush can finish after newer changes were queued
+export function pendingCount(): number {
+  return read().length;
 }
 
 function send(store: ListStore, body: OpBody): Promise<void> {
@@ -89,12 +93,11 @@ function isNetworkError(error: unknown): boolean {
 let flushing = false;
 
 // Sends queued changes in order. Stops at the first network error and retries later.
-// Returns how many changes are still waiting.
 export async function flushOutbox(
   store: ListStore,
   onDropped: () => void,
-): Promise<number> {
-  if (flushing) return read().length;
+): Promise<void> {
+  if (flushing) return;
   flushing = true;
   try {
     for (;;) {
@@ -120,5 +123,4 @@ export async function flushOutbox(
   } finally {
     flushing = false;
   }
-  return read().length;
 }

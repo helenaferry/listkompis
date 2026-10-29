@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { applyPending, enqueue, flushOutbox } from "@/lib/outbox";
+import {
+  applyPending,
+  enqueue,
+  flushOutbox,
+  pendingCount,
+} from "@/lib/outbox";
 import type { ListStore } from "@/lib/listStore";
 import type { Item } from "@/lib/types";
 
@@ -58,9 +63,9 @@ describe("outbox", () => {
       patch: { is_checked: true },
     });
 
-    const remaining = await flushOutbox(store, vi.fn());
+    await flushOutbox(store, vi.fn());
 
-    expect(remaining).toBe(0);
+    expect(pendingCount()).toBe(0);
     expect(store.addItem).toHaveBeenCalledWith("list-1", expect.objectContaining({ id: "a" }));
     expect(store.updateItem).toHaveBeenCalledWith("a", { is_checked: true });
     expect(store.addItem.mock.invocationCallOrder[0]).toBeLessThan(
@@ -80,6 +85,7 @@ describe("outbox", () => {
     }
 
     expect(onDropped).not.toHaveBeenCalled();
+    expect(pendingCount()).toBe(1);
     expect(window.localStorage.getItem("listkompis_outbox")).toContain('"a"');
   });
 
@@ -92,12 +98,11 @@ describe("outbox", () => {
     const onDropped = vi.fn();
     enqueue({ kind: "add", listId: "list-1", item: makeItem("a") });
 
-    let remaining = 1;
-    for (let i = 0; i < 10 && remaining > 0; i++) {
-      remaining = await flushOutbox(store, onDropped);
+    for (let i = 0; i < 10 && pendingCount() > 0; i++) {
+      await flushOutbox(store, onDropped);
     }
 
-    expect(remaining).toBe(0);
+    expect(pendingCount()).toBe(0);
     expect(onDropped).toHaveBeenCalledTimes(1);
   });
 });
