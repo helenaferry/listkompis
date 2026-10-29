@@ -24,9 +24,18 @@ create table if not exists public.items (
   list_id    uuid        not null references public.lists(id) on delete cascade,
   text       text        not null check (char_length(text) > 0 and char_length(text) <= 500),
   is_checked boolean     not null default false,
+  is_starred boolean     not null default false,
   created_at timestamptz not null default now(),
   created_by uuid        references auth.users(id) on delete set null
 );
+
+alter table public.items
+  add column if not exists is_starred boolean not null default false;
+
+-- Manual sort order within each group (starred / regular). Lower is higher up.
+-- Ties fall back to created_at, so existing items keep their current order.
+alter table public.items
+  add column if not exists position integer not null default 0;
 
 -- Invite tokens for sharing lists
 create table if not exists public.list_invites (
@@ -319,6 +328,35 @@ begin
   where list_id = p_list_id and is_checked = true;
 end;
 $$;
+
+-- Sets position = index in p_item_ids, so the array is the full new order
+create or replace function public.set_item_order(p_list_id uuid, p_item_ids uuid[])
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then raise exception 'Not authenticated'; end if;
+
+  if not exists (
+    select 1 from public.list_members
+    where list_id = p_list_id and user_id = v_user_id
+  ) then
+    raise exception 'Not a member of this list';
+  end if;
+
+  update public.items as i
+  set position = o.ord - 1
+  from unnest(p_item_ids) with ordinality as o(id, ord)
+  where i.id = o.id and i.list_id = p_list_id;
+end;
+$$;
+
+NOTIFY pgrst, 'reload schema';
 
 create or replace function public.delete_list(p_list_id uuid)
 returns void

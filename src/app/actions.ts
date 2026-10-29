@@ -89,6 +89,18 @@ export async function deleteCheckedItems(listId: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function setItemOrder(
+  listId: string,
+  itemIds: string[],
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_item_order", {
+    p_list_id: listId,
+    p_item_ids: itemIds,
+  });
+  if (error) throw new Error(error.message);
+}
+
 export async function removeListMember(
   listId: string,
   memberId: string,

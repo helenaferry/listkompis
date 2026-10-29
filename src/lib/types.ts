@@ -3,6 +3,8 @@ export type Item = {
   list_id: string;
   text: string;
   is_checked: boolean;
+  is_starred: boolean;
+  position: number;
   created_at: string;
   created_by: string | null;
 };

@@ -7,6 +7,8 @@ const mockItem = {
   list_id: "list-1",
   text: "Köp mjölk",
   is_checked: false,
+  is_starred: false,
+  position: 0,
   created_at: "2024-01-01T00:00:00Z",
   created_by: null,
 };
@@ -98,7 +100,7 @@ describe("ChecklistItem", () => {
   });
 
   it("shows strikethrough text when item is checked", () => {
-    const checkedItem = { ...mockItem, is_checked: true };
+    const checkedItem = { ...mockItem, is_checked: true, is_starred: false };
     render(
       <ChecklistItem
         item={checkedItem}
@@ -170,5 +172,21 @@ describe("ChecklistItem", () => {
     fireEvent.change(input, { target: { value: "Något annat" } });
     fireEvent.keyDown(input, { key: "Escape" });
     expect(screen.getByText("Köp mjölk")).toBeInTheDocument();
+  });
+
+  it("calls onToggleStar when clicking the star button", () => {
+    const onToggleStar = vi.fn();
+    render(
+      <ChecklistItem
+        item={{ ...mockItem, is_starred: false }}
+        onToggle={vi.fn()}
+        onEdit={vi.fn()}
+        onToggleStar={onToggleStar}
+        hideMode="strike"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /Stjärnmärk/ }));
+    expect(onToggleStar).toHaveBeenCalledWith("1", true);
   });
 });

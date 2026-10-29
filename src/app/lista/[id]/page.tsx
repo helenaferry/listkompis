@@ -61,7 +61,6 @@ export default async function ListPage({
         initialItems={(items ?? []) as Item[]}
         userId={user.id}
         userEmail={user.email ?? ""}
-        isFavorite={membership.is_favorite}
         createdBy={list.created_by}
       />
     </main>
